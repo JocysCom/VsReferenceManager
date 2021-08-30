@@ -170,11 +170,17 @@ namespace JocysCom.VS.ReferenceManager.Controls
 
 		private void ReferencesListPanel_UpdateButton_Click(object sender, RoutedEventArgs e)
 		{
-				ThreadHelper.ThrowIfNotOnUIThread();
+			ThreadHelper.ThrowIfNotOnUIThread();
 			var form = new MessageBoxWindow();
 			var result = form.ShowDialog("Replace references with projects?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 			if (result != MessageBoxResult.OK)
 				return;
+			UpdateProjectTask(null);
+		}
+
+		public void UpdateProjectTask(object state)
+		{
+			Global.MainWindow.HMan.AddTask(TaskName.Update);
 			var selectedVsProject = GetSelectedVsProject();
 			if (selectedVsProject == null)
 				return;
@@ -223,6 +229,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				var project = addedProjects[item];
 				selectedVsProject.References.AddProject(project);
 			}
+			Global.MainWindow.HMan.RemoveTask(TaskName.Update);
 		}
 
 	}
