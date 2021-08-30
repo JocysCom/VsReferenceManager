@@ -8,11 +8,11 @@ Extension scans specified locations with projects. Then it will use that date to
 
 ## Update DLL references with Project references
 
-Before: Solution with Project4, which references two DLL assemblies:
+Before: Solution's Project4 references two DLL assemblies:
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img alt="Solution From" src="ReferenceManager/Documents/Images/Solution_From.png" width="330" height="220">
 
-After: Solution with Project4, which references two Projects:
+After: Solution includes two projects and Project4 references them:
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img alt="Solution To" src="ReferenceManager/Documents/Images/Solution_To.png" width="330" height="255">
 
