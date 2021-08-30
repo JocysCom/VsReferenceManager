@@ -9,10 +9,10 @@ Extension scans specified locations with projects. Then it will use that date to
 ## Update References with Projects
 
 Before: Solution with Project4, which references two DLL assemblies:
-
-![Solution_From](https://github.com/JocysCom/VsReferenceManager/blob/master/ReferenceManager/Documents/Images/Solution_From.png "Solution with DLL references")
+<blockquote>
+<img alt="Solution From" src="ReferenceManager/Documents/Images/Solution_From.png" width="330" height="220">
+</blockquote>
 
 Before: Solution with Project4, which references two Projects:
 
-![Solution_To](https://github.com/JocysCom/VsReferenceManager/blob/master/ReferenceManager/Documents/Images/Solution_To.png "Solution with Project references")
-
+<img alt="Solution To" src="ReferenceManager/Documents/Images/Solution_To.png" width="330" height="220">
