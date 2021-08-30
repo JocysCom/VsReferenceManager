@@ -85,7 +85,7 @@
 							Height="12"
 							VerticalAlignment="Center"
 							Content="{StaticResource Icon_gearwheel}" />
-						<Label Padding="4,0,0,0" VerticalAlignment="Center" Content="Ste 1: Find Projects" />
+						<Label Padding="4,0,0,0" VerticalAlignment="Center" Content="Step 1: Find Projects" />
 					</StackPanel>
 				</TabItem.Header>
 				<controls:OptionsControl x:Name="OptionsPanel" />
