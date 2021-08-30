@@ -29,6 +29,7 @@
 			<TabItem.Header>
 				<StackPanel Orientation="Horizontal">
 					<ContentControl
+						x:Name="TabIconContentControl"
 						Width="12"
 						Height="12"
 						VerticalAlignment="Center"
@@ -113,6 +114,31 @@
 					</DataGrid.Resources>
 					<DataGrid.Columns>
 						<DataGridCheckBoxColumn Binding="{Binding IsEnabled}" EditingElementStyle="{StaticResource CheckBoxCell}" ElementStyle="{StaticResource CheckBoxCell}" />
+						<DataGridTemplateColumn
+							x:Name="StatusCodeColumn"
+							Width="SizeToCells"
+							Header=""
+							IsReadOnly="True">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<ContentControl Style="{StaticResource ButtonContentControl}">
+										<ContentControl.Content>
+											<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+												<Binding RelativeSource="{RelativeSource Self}" />
+												<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+												<Binding Path="StatusCode" />
+											</MultiBinding>
+										</ContentControl.Content>
+									</ContentControl>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTextColumn
+							x:Name="StatusTextColumn"
+							Binding="{Binding StatusText}"
+							EditingElementStyle="{StaticResource TextBoxCell}"
+							ElementStyle="{StaticResource TextBlockCell}"
+							Header="Status" />
 						<DataGridTextColumn
 							x:Name="SolutionNameColumn"
 							Binding="{Binding SolutionName}"
@@ -151,7 +177,6 @@
 							EditingElementStyle="{StaticResource TextBoxCell}"
 							ElementStyle="{StaticResource TextBlockCell}"
 							Header="Reference Name" />
-
 						<DataGridTextColumn
 							x:Name="ReferencePathColumn"
 							Width="*"

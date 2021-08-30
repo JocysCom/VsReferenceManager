@@ -191,7 +191,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					item.ProjectName = p.ProjectName;
 					item.ProjectPath = p.ProjectPath;
 					item.ProjectAssemblyName = p.ProjectAssemblyName;
-					item.StatusCode = ProjectScannerState.DataUpdated;
+					item.StatusCode = MessageBoxImage.Information;
 					item.StatusText = "Project Found";
 				}
 			}

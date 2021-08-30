@@ -1,5 +1,6 @@
 ﻿using JocysCom.ClassLibrary.ComponentModel;
 using JocysCom.ClassLibrary.Controls;
+using JocysCom.ClassLibrary.Controls.Themes;
 using JocysCom.VS.ReferenceManager.Converters;
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,23 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					? System.Windows.Media.Brushes.Black
 					: System.Windows.Media.Brushes.Gray;
 			}
+			// Format StatusCodeColumn value.
+			if (cell.Column == StatusCodeColumn)
+			{
+				switch (item.StatusCode)
+				{
+					case MessageBoxImage.Error:
+						return Icons.Current[Icons.Icon_Error];
+					case MessageBoxImage.Question:
+						return Icons.Current[Icons.Icon_Question];
+					case MessageBoxImage.Warning:
+						return Icons.Current[Icons.Icon_Warning];
+					case MessageBoxImage.Information:
+						return Icons.Current[Icons.Icon_Information];
+					default:
+						return null;
+				}
+			}
 			return value;
 		}
 
@@ -67,18 +85,21 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			{
 				case ProjectsControlType.Solution:
 					HeadLabel.Content = "Solution";
-					ShowColumns(SolutionNameColumn, SolutionPathColumn);
+					ShowColumns(StatusCodeColumn, StatusTextColumn, SolutionNameColumn, SolutionPathColumn);
 					ShowButtons(RefreshButton);
+					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_Visual_Studio];
 					break;
 				case ProjectsControlType.Projects:
 					HeadLabel.Content = "Projects";
-					ShowColumns(ProjectNameColumn, ProjectPathColumn);
+					ShowColumns(StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ProjectPathColumn);
 					ShowButtons(RefreshButton);
+					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_windows];
 					break;
 				case ProjectsControlType.References:
 					HeadLabel.Content = "References";
-					ShowColumns(ProjectNameColumn, ReferenceNameColumn, ReferencePathColumn);
+					ShowColumns(StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ReferenceNameColumn, ReferencePathColumn);
 					ShowButtons(ScanButton, UpdateButton, RefreshButton);
+					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_arrow_fork2];
 					break;
 				case ProjectsControlType.ScanResults:
 					HeadLabel.Content = "Scan Results";
@@ -87,8 +108,9 @@ namespace JocysCom.VS.ReferenceManager.Controls
 						ReferenceList = Global.ReferenceItems.Items;
 						MainDataGrid.ItemsSource = ReferenceList;
 					}
-					ShowColumns(ProjectNameColumn, ProjectAssemblyNameColumn, ReferenceNameColumn, ReferencePathColumn);
+					ShowColumns(StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ProjectAssemblyNameColumn, ReferenceNameColumn, ReferencePathColumn);
 					ShowButtons(ScanButton, ExportButton);
+					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_clipboard_checks];
 					break;
 				default:
 					break;

@@ -37,8 +37,8 @@ namespace JocysCom.VS.ReferenceManager
 		public string StatusText { get => _StatusText; set => SetProperty(ref _StatusText, value); }
 		string _StatusText;
 
-		public ProjectScannerState StatusCode { get => _StatusCode; set => SetProperty(ref _StatusCode, value); }
-		ProjectScannerState _StatusCode;
+		public System.Windows.MessageBoxImage StatusCode { get => _StatusCode; set => SetProperty(ref _StatusCode, value); }
+		System.Windows.MessageBoxImage _StatusCode;
 
 		public bool IsEnabled { get => _IsEnabled; set => SetProperty(ref _IsEnabled, value); }
 		bool _IsEnabled;
