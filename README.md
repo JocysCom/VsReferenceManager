@@ -14,7 +14,7 @@ Before: Solution with Project4, which references two DLL assemblies:
 
 After: Solution with Project4, which references two Projects:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img alt="Solution To" src="ReferenceManager/Documents/Images/Solution_To.png" width="330" height="220">
+&nbsp;&nbsp;&nbsp;&nbsp;<img alt="Solution To" src="ReferenceManager/Documents/Images/Solution_To.png" width="330" height="255">
 
 ## Screenshots
 
