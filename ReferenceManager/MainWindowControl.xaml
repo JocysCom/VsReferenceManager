@@ -1,0 +1,108 @@
+﻿<UserControl
+	x:Class="JocysCom.VS.ReferenceManager.MainWindowControl"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:controls="clr-namespace:JocysCom.VS.ReferenceManager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	Name="MainWindowPanel"
+	d:DesignHeight="400"
+	d:DesignWidth="720"
+	Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+	Unloaded="MainWindowPanel_Unloaded"
+	mc:Ignorable="d">
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="JocysCom/Controls/Themes/Default.xaml" />
+				<ResourceDictionary Source="JocysCom/Controls/Themes/Icons.xaml" />
+				<ResourceDictionary Source="Resources/Icons/Icons_Default.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+		<Grid Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Label
+				Name="HelpHeadLabel"
+				Grid.Row="0"
+				Grid.Column="0"
+				Grid.ColumnSpan="2"
+				Margin="8,3,3,3"
+				Padding="0"
+				Content="[HelpHeadLabel]"
+				FontWeight="Bold" />
+			<ContentControl
+				Name="LeftIcon"
+				Grid.Row="1"
+				Grid.Column="0"
+				Width="24"
+				Height="24"
+				Margin="8,0,3,3"
+				Padding="0"
+				Content="{StaticResource Icon_Information}"
+				Style="{StaticResource ButtonContentControl}" />
+			<TextBlock
+				Name="HelpBodyLabel"
+				Grid.Row="1"
+				Grid.Column="1"
+				Margin="3,0,3,3"
+				Padding="0"
+				VerticalAlignment="Top"
+				Text="[HelpBodyLabel]"
+				TextWrapping="Wrap" />
+			<ContentControl
+				Name="RightIcon"
+				Grid.Row="0"
+				Grid.RowSpan="2"
+				Grid.Column="2"
+				Width="48"
+				Height="48"
+				Margin="4,4,8,4"
+				Padding="0"
+				Content="{StaticResource Icon_elements_tree}"
+				Style="{StaticResource ButtonContentControl}" />
+		</Grid>
+		<TabControl Grid.Row="1" Margin="4">
+			<TabItem>
+				<TabItem.Header>
+					<StackPanel Orientation="Horizontal">
+						<ContentControl
+							Width="12"
+							Height="12"
+							VerticalAlignment="Center"
+							Content="{StaticResource Icon_gearwheel}" />
+						<Label Padding="4,0,0,0" VerticalAlignment="Center" Content="Ste 1: Find Projects" />
+					</StackPanel>
+				</TabItem.Header>
+				<controls:OptionsControl x:Name="OptionsPanel" />
+			</TabItem>
+			<TabItem>
+				<TabItem.Header>
+					<StackPanel Orientation="Horizontal">
+						<ContentControl
+							Width="12"
+							Height="12"
+							VerticalAlignment="Center"
+							Content="{StaticResource Icon_elements_tree}" />
+						<Label Padding="4,0,0,0" VerticalAlignment="Center" Content="Step 2: Update References" />
+					</StackPanel>
+				</TabItem.Header>
+				<controls:MainControl x:Name="MainPanel" />
+			</TabItem>
+		</TabControl>
+	</Grid>
+</UserControl>

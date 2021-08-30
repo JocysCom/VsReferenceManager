@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31613.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JocysCom.VS.ReferenceManager", "ReferenceManager\JocysCom.VS.ReferenceManager.csproj", "{0A43876A-C7D6-4AAA-8651-C645CD79194B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demo Projects", "Demo Projects", "{9E3332D8-4F60-4E9E-A32D-4391015F7B8F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JocysCom.VS.DemoProjects.Project1", "DemoProjects\Project1\JocysCom.VS.DemoProjects.Project1.csproj", "{94858FFF-1214-42F0-9FE1-8CD4D69D456A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JocysCom.VS.DemoProjects.Project2", "DemoProjects\Project2\JocysCom.VS.DemoProjects.Project2.csproj", "{6E9EF7BB-6C32-429E-B4B5-F2ED817A238A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JocysCom.VS.DemoProjects.Project3", "DemoProjects\Project3\JocysCom.VS.DemoProjects.Project3.csproj", "{662D595E-CB62-44C6-A55D-3CA103A314EF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JocysCom.VS.DemoProjects.Project4", "DemoProjects\Project4\JocysCom.VS.DemoProjects.Project4.csproj", "{1C92F8B1-2A0C-44B8-89AA-4C46DD2E34B4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0A43876A-C7D6-4AAA-8651-C645CD79194B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A43876A-C7D6-4AAA-8651-C645CD79194B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A43876A-C7D6-4AAA-8651-C645CD79194B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A43876A-C7D6-4AAA-8651-C645CD79194B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94858FFF-1214-42F0-9FE1-8CD4D69D456A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94858FFF-1214-42F0-9FE1-8CD4D69D456A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94858FFF-1214-42F0-9FE1-8CD4D69D456A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94858FFF-1214-42F0-9FE1-8CD4D69D456A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E9EF7BB-6C32-429E-B4B5-F2ED817A238A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E9EF7BB-6C32-429E-B4B5-F2ED817A238A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E9EF7BB-6C32-429E-B4B5-F2ED817A238A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E9EF7BB-6C32-429E-B4B5-F2ED817A238A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{662D595E-CB62-44C6-A55D-3CA103A314EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{662D595E-CB62-44C6-A55D-3CA103A314EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{662D595E-CB62-44C6-A55D-3CA103A314EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{662D595E-CB62-44C6-A55D-3CA103A314EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C92F8B1-2A0C-44B8-89AA-4C46DD2E34B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C92F8B1-2A0C-44B8-89AA-4C46DD2E34B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C92F8B1-2A0C-44B8-89AA-4C46DD2E34B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C92F8B1-2A0C-44B8-89AA-4C46DD2E34B4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{94858FFF-1214-42F0-9FE1-8CD4D69D456A} = {9E3332D8-4F60-4E9E-A32D-4391015F7B8F}
+		{6E9EF7BB-6C32-429E-B4B5-F2ED817A238A} = {9E3332D8-4F60-4E9E-A32D-4391015F7B8F}
+		{662D595E-CB62-44C6-A55D-3CA103A314EF} = {9E3332D8-4F60-4E9E-A32D-4391015F7B8F}
+		{1C92F8B1-2A0C-44B8-89AA-4C46DD2E34B4} = {9E3332D8-4F60-4E9E-A32D-4391015F7B8F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FBFF2296-DB1F-4D4F-B14D-BE266743B9AE}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31613.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JocysCom.VS.DemoProjects.Project3", "Project3\JocysCom.VS.DemoProjects.Project3.csproj", "{6F8D0659-D60D-4416-9B96-EED59A2CC3BB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JocysCom.VS.DemoProjects.Project4", "Project4\JocysCom.VS.DemoProjects.Project4.csproj", "{600D15D2-A046-4CA1-83F2-8D6440A6A202}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F8D0659-D60D-4416-9B96-EED59A2CC3BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F8D0659-D60D-4416-9B96-EED59A2CC3BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F8D0659-D60D-4416-9B96-EED59A2CC3BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F8D0659-D60D-4416-9B96-EED59A2CC3BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{600D15D2-A046-4CA1-83F2-8D6440A6A202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{600D15D2-A046-4CA1-83F2-8D6440A6A202}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{600D15D2-A046-4CA1-83F2-8D6440A6A202}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{600D15D2-A046-4CA1-83F2-8D6440A6A202}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FBFF2296-DB1F-4D4F-B14D-BE266743B9AE}
+	EndGlobalSection
+EndGlobal

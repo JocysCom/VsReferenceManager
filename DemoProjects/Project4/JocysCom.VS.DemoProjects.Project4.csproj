@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Project3\JocysCom.VS.DemoProjects.Project3.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="JocysCom.VS.DemoProjects.Project1">
+      <HintPath>..\Project1\bin\Debug\net5.0\JocysCom.VS.DemoProjects.Project1.dll</HintPath>
+    </Reference>
+    <Reference Include="JocysCom.VS.DemoProjects.Project2">
+      <HintPath>..\Project2\bin\Debug\net5.0\JocysCom.VS.DemoProjects.Project2.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
