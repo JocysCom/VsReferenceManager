@@ -1,4 +1,12 @@
-# Removes temporary bin and obj folders.
+<#
+.SYNOPSIS
+    Removes temporary bin and obj folders.
+.NOTES
+    Author:     Evaldas Jocys <evaldas@jocys.com>
+    Modified:   2021-08-31
+.LINK
+    http://www.jocys.com
+#>
 # ----------------------------------------------------------------------------
 # Get current command path.
 [string]$current = $MyInvocation.MyCommand.Path
@@ -28,7 +36,7 @@ Function RemoveDirectories
 	{
 		[System.IO.DirectoryInfo] $parent = $item.Parent;
 		$projects = $parent.GetFiles("*.*proj", [System.IO.SearchOption]::TopDirectoryOnly);
-		# If Project file in parent folder was found then...
+		# If project file was found in parent folder then...
 		if ($projects.length -gt 0){
 			Write-Output "Remove: $($item.FullName)";
 			$global:removeCount += 1;
@@ -41,8 +49,8 @@ Function RemoveDirectories
 		}
 	}
 }
-# Clear directories.
-RemoveDirectories "bin"
+# Remove 'obj' folders first, because it can contain 'bin' inside.
 RemoveDirectories "obj"
+RemoveDirectories "bin"
 Write-Output "Skipped: $global:skipCount, Removed: $global:removeCount";
 pause
