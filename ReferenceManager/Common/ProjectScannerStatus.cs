@@ -1,6 +1,6 @@
 ﻿namespace JocysCom.VS.ReferenceManager
 {
-	public enum ProjectScannerState
+	public enum ProjectScannerStatus
 	{
 		None = 0,
 		Started,

@@ -16,7 +16,7 @@ namespace JocysCom.VS.ReferenceManager
 		public int Added { get; set; }
 		public int Updated { get; set; }
 		public string Message { get; set; }
-		public ProjectScannerState State { get; set; }
+		public ProjectScannerStatus State { get; set; }
 		public List<ReferenceItem>  Data { get; set; }
 
 	}

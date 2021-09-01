@@ -27,6 +27,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				return;
 			ReferenceList = new SortableBindingList<ReferenceItem>();
 			MainDataGrid.ItemsSource = ReferenceList;
+			if (ReferenceList.Count > 0)
+				MainDataGrid.SelectedIndex = 0;
 			ExportSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			// Configure converter.
 			var gridFormattingConverter = MainDataGrid.Resources.Values.Cast<ItemFormattingConverter>().First();
@@ -92,13 +94,13 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				case ProjectsControlType.Projects:
 					HeadLabel.Content = "Projects";
 					ShowColumns(StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ProjectPathColumn);
-					ShowButtons(RefreshButton);
+					ShowButtons(UpdateButton, RefreshButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_windows];
 					break;
 				case ProjectsControlType.References:
 					HeadLabel.Content = "References";
 					ShowColumns(StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ReferenceNameColumn, ReferencePathColumn);
-					ShowButtons(ScanButton, UpdateButton, RefreshButton);
+					ShowButtons(ScanButton, RefreshButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_arrow_fork2];
 					break;
 				case ProjectsControlType.ScanResults:
@@ -107,6 +109,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					{
 						ReferenceList = Global.ReferenceItems.Items;
 						MainDataGrid.ItemsSource = ReferenceList;
+						if (ReferenceList.Count > 0)
+							MainDataGrid.SelectedIndex = 0;
 					}
 					ShowColumns(StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ProjectAssemblyNameColumn, ReferenceNameColumn, ReferencePathColumn);
 					ShowButtons(ScanButton, ExportButton);
@@ -156,8 +160,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			var success = System.Threading.ThreadPool.QueueUserWorkItem(ScanTask);
 			if (!success)
 			{
-				ScanProgressLevel0Label.Text = "Scan failed!";
-				ScanProgressLevel1Label.Text = "";
+				ProgressLevelTopLabel.Text = "Scan failed!";
+				ProgressLevelSubLabel.Text = "";
 				ScanButton.IsEnabled = true;
 				Global.MainWindow.HMan.RemoveTask(TaskName.Scan);
 			}
@@ -182,8 +186,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			}
 			ControlsHelper.Invoke(() =>
 			{
-				ScanProgressLevel0Label.Text = "...";
-				ScanProgressLevel1Label.Text = "";
+				ProgressLevelTopLabel.Text = "...";
+				ProgressLevelSubLabel.Text = "";
 				ScanProgressPanel.Visibility = Visibility.Visible;
 				ScanButton.IsEnabled = false;
 			});
@@ -206,15 +210,15 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			}
 			var scanner = (ProjectScanner)sender;
 			var label = e.Level == 0
-				? ScanProgressLevel0Label
-				: ScanProgressLevel1Label;
+				? ProgressLevelTopLabel
+				: ProgressLevelSubLabel;
 			switch (e.State)
 			{
-				case ProjectScannerState.Started:
+				case ProjectScannerStatus.Started:
 					label.Text = "Scanning...";
 					break;
-				case ProjectScannerState.DataFound:
-				case ProjectScannerState.DataUpdated:
+				case ProjectScannerStatus.DataFound:
+				case ProjectScannerStatus.DataUpdated:
 					lock (AddAndUpdateLock)
 					{
 						var data = e.Data;
@@ -222,15 +226,15 @@ namespace JocysCom.VS.ReferenceManager.Controls
 							ReferenceList.Add(r);
 					}
 					break;
-				case ProjectScannerState.DirectoryUpdate:
-				case ProjectScannerState.FileUpdate:
+				case ProjectScannerStatus.DirectoryUpdate:
+				case ProjectScannerStatus.FileUpdate:
 					var sb = new StringBuilder();
 					sb.AppendLine(e.Message);
-					if (e.State == ProjectScannerState.DirectoryUpdate && e.Directories != null)
+					if (e.State == ProjectScannerStatus.DirectoryUpdate && e.Directories != null)
 					{
 						sb.AppendFormat("Current Folder: {0}", e.Directories[e.DirectoryIndex].FullName);
 					}
-					if (e.State == ProjectScannerState.FileUpdate && e.Files != null)
+					if (e.State == ProjectScannerStatus.FileUpdate && e.Files != null)
 					{
 						var file = e.Files[e.FileIndex];
 						var size = file.Length / 1024 / 1024;
@@ -247,7 +251,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 						label.Text = sb.ToString();
 					});
 					break;
-				case ProjectScannerState.Completed:
+				case ProjectScannerStatus.Completed:
 					ControlsHelper.Invoke(() =>
 					{
 						ScanButton.IsEnabled = true;

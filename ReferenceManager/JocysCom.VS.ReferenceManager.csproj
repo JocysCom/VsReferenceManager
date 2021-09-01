@@ -51,8 +51,11 @@
     <Compile Include="Common\ProjectFileInfo.cs" />
     <Compile Include="Common\ProjectScanner.cs" />
     <Compile Include="Common\ProjectScannerEventArgs.cs" />
-    <Compile Include="Common\ProjectScannerState.cs" />
+    <Compile Include="Common\ProjectScannerStatus.cs" />
     <Compile Include="Common\ProjectsControlType.cs" />
+    <Compile Include="Common\ProjectUpdater.cs" />
+    <Compile Include="Common\ProjectUpdaterEventArgs.cs" />
+    <Compile Include="Common\ProjectUpdaterStatus.cs" />
     <Compile Include="Common\ReferenceItem.cs" />
     <Compile Include="Common\SolutionHelper.cs" />
     <Compile Include="Common\TaskName.cs" />

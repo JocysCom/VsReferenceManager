@@ -47,7 +47,10 @@
 					<RowDefinition Height="*" />
 					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
-				<ToolBarPanel Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource MainToolBarPanel}">
+				<ToolBarPanel
+					Grid.Row="0"
+					HorizontalAlignment="Right"
+					Style="{StaticResource MainToolBarPanel}">
 					<ToolBar Style="{StaticResource MainToolBar}">
 						<Button
 							Name="ScanButton"
@@ -113,7 +116,10 @@
 						<converters:ItemFormattingConverter x:Key="_MainDataGridFormattingConverter" />
 					</DataGrid.Resources>
 					<DataGrid.Columns>
-						<DataGridCheckBoxColumn Binding="{Binding IsEnabled}" EditingElementStyle="{StaticResource CheckBoxCell}" ElementStyle="{StaticResource CheckBoxCell}" />
+						<DataGridCheckBoxColumn
+							Binding="{Binding IsEnabled}"
+							EditingElementStyle="{StaticResource CheckBoxCell}"
+							ElementStyle="{StaticResource CheckBoxCell}" />
 						<DataGridTemplateColumn
 							x:Name="StatusCodeColumn"
 							Width="SizeToCells"
@@ -199,10 +205,40 @@
 					</DataGrid.CellStyle>
 				</DataGrid>
 				<StackPanel x:Name="ScanProgressPanel" Grid.Row="2">
-					<StackPanel Margin="4,4,4,4">
-						<TextBlock x:Name="ScanProgressLevel0Label" Text="[ScanProgressLevel0Label]" />
-						<TextBlock x:Name="ScanProgressLevel1Label" Text="[ScanProgressLevel1Label]" />
-					</StackPanel>
+					<Grid Margin="4,4,4,4">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<ProgressBar
+							x:Name="ProgressLevelTopBar"
+							Grid.Row="0"
+							Grid.Column="0"
+							Width="100"
+							Margin="0,2,0,2" />
+						<TextBlock
+							x:Name="ProgressLevelTopLabel"
+							Grid.Row="0"
+							Grid.Column="1"
+							Margin="4,0,0,0"
+							Text="[ProgressLevelTopLabel]" />
+						<ProgressBar
+							x:Name="ProgressLevelSubBar"
+							Grid.Row="1"
+							Grid.Column="0"
+							Width="100"
+							Margin="0,2,0,2" />
+						<TextBlock
+							x:Name="ProgressLevelSubLabel"
+							Grid.Row="1"
+							Grid.Column="1"
+							Margin="4,0,0,0"
+							Text="[ProgressLevelSubLabel]" />
+					</Grid>
 				</StackPanel>
 			</Grid>
 

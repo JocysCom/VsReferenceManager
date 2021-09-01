@@ -7,6 +7,13 @@ namespace JocysCom.VS.ReferenceManager
 	public static class SolutionHelper
 	{
 
+		public static DTE2 GetCurrentService()
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+			var dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
+			return dte;
+		}
+
 		public static Solution2 GetCurrentSolution()
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();

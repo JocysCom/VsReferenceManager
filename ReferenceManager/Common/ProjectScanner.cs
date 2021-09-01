@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace JocysCom.VS.ReferenceManager
 {
-	public class ProjectScanner
+	public class ProjectScanner : IProgress<ProjectScannerEventArgs>
 	{
 
 		public ProjectScanner()
@@ -17,16 +17,19 @@ namespace JocysCom.VS.ReferenceManager
 			ff.FileFound += ff_FileFound;
 		}
 
+		#region ■ IProgress
+
 		public event EventHandler<ProjectScannerEventArgs> Progress;
 
-		private void ReportProgress(ProjectScannerEventArgs e)
-		{
-			var ev = Progress;
-			if (ev != null)
-			{
-				ev(this, e);
-			}
-		}
+		public void Report(ProjectScannerEventArgs e)
+			=> Progress?.Invoke(this, e);
+
+		#endregion
+
+		public DateTime DateStarted => _DateStarted;
+		private DateTime _DateStarted;
+		public DateTime DateEnded => _DateEnded;
+		private DateTime _DateEnded;
 
 		public static SettingsData<ProjectFileInfo> CashedData = new SettingsData<ProjectFileInfo>("ProjectsCache.xml", false, "Project scanner cache.", System.Reflection.Assembly.GetExecutingAssembly());
 		private static readonly object FileInfoCacheLock = new object();
@@ -74,14 +77,15 @@ namespace JocysCom.VS.ReferenceManager
 
 		public void Scan(string[] paths, IList<ProjectFileInfo> currentInfo, string fileName = null)
 		{
+			_DateStarted = DateTime.Now;
 			IsStopping = false;
 			IsPaused = false;
 			// Step 1: Get list of files inside the folder.
 			var e = new ProjectScannerEventArgs
 			{
-				State = ProjectScannerState.Started
+				State = ProjectScannerStatus.Started
 			};
-			ReportProgress(e);
+			Report(e);
 			var skipped = 0;
 			var added = 0;
 			var updated = 0;
@@ -107,12 +111,12 @@ namespace JocysCom.VS.ReferenceManager
 					Message = string.Format("Step 2: Scan file {0} of {1}. Please wait...", i + 1, files.Count),
 					FileIndex = i,
 					Files = files,
-					State = ProjectScannerState.FileUpdate,
+					State = ProjectScannerStatus.FileUpdate,
 					Added = added,
 					Skipped = skipped,
 					Updated = updated
 				};
-				ReportProgress(e);
+				Report(e);
 				e = new ProjectScannerEventArgs
 				{
 					FileInfo = file
@@ -124,21 +128,22 @@ namespace JocysCom.VS.ReferenceManager
 				// If file doesn't exist current list then...
 				if (info == null)
 				{
-					e.State = ProjectScannerState.DataFound;
+					e.State = ProjectScannerStatus.DataFound;
 					added++;
 				}
 				else
 				{
-					e.State = ProjectScannerState.DataUpdated;
+					e.State = ProjectScannerStatus.DataUpdated;
 					updated++;
 				}
-				ReportProgress(e);
+				Report(e);
 			}
+			_DateEnded = DateTime.Now;
 			e = new ProjectScannerEventArgs
 			{
-				State = ProjectScannerState.Completed
+				State = ProjectScannerStatus.Completed
 			};
-			ReportProgress(e);
+			Report(e);
 		}
 
 		private void ff_FileFound(object sender, FileFinderEventArgs e)
@@ -149,10 +154,10 @@ namespace JocysCom.VS.ReferenceManager
 				Directories = e.Directories,
 				FileIndex = e.FileIndex,
 				Files = e.Files,
-				State = ProjectScannerState.DirectoryUpdate,
+				State = ProjectScannerStatus.DirectoryUpdate,
 				Message = string.Format("Step 1: {0} files found. Searching path {1} of {2}. Please wait...", e.Files.Count, e.DirectoryIndex + 1, e.Directories.Count)
 			};
-			ReportProgress(e2);
+			Report(e2);
 		}
 
 		/// <summary>
@@ -193,7 +198,7 @@ namespace JocysCom.VS.ReferenceManager
 				});
 			// Add project without references.
 			var projectItem = getNewItem(null, null, null);
-				data.Add(projectItem);
+			data.Add(projectItem);
 			for (int i = 0; i < referenceNodes.Count(); i++)
 			{
 				// <Reference Include="NameSpace.ProjectName">

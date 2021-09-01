@@ -1,6 +1,4 @@
-﻿using EnvDTE;
-using EnvDTE80;
-using JocysCom.ClassLibrary.ComponentModel;
+﻿using JocysCom.ClassLibrary.ComponentModel;
 using JocysCom.ClassLibrary.Controls;
 using Microsoft.VisualStudio.Shell;
 using System.Collections.Generic;
@@ -19,9 +17,9 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		public MainControl()
 		{
 			InitializeComponent();
-			ProjectListPanel.MainDataGrid.SelectionChanged += ProjectsListPanel_MainDataGrid_SelectionChanged;
 			SolutionListPanel.MainDataGrid.SelectionChanged += SolutionListPanel_MainDataGrid_SelectionChanged;
-			ReferencesListPanel.UpdateButton.Click += ReferencesListPanel_UpdateButton_Click;
+			ProjectListPanel.MainDataGrid.SelectionChanged += ProjectsListPanel_MainDataGrid_SelectionChanged;
+			ProjectListPanel.UpdateButton.Click += ProjectListPanel_UpdateButton_Click;
 		}
 
 		private void SolutionListPanel_MainDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -36,7 +34,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			=> ProjectListPanel.ReferenceList;
 
 		public SortableBindingList<ReferenceItem> ReferenceList
-			=> ReferencesListPanel.ReferenceList;
+			=> ReferenceListPanel.ReferenceList;
 
 		/// <summary>
 		/// Handles click on the button by displaying a message box.
@@ -71,6 +69,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			};
 			// This is a project reference
 			SolutionList.Add(item);
+			if (SolutionList.Count > 0)
+				SolutionListPanel.MainDataGrid.SelectedIndex = 0;
 		}
 
 		public void UpdateProjects()
@@ -95,6 +95,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					ProjectList.Add(item);
 				}
 			}
+			if (ProjectList.Count > 0)
+				ProjectListPanel.MainDataGrid.SelectedIndex = 0;
 		}
 
 		public void UpdateReferences()
@@ -131,6 +133,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					ReferenceList.Add(item);
 				}
 			}
+			if (ReferenceList.Count > 0)
+				ReferenceListPanel.MainDataGrid.SelectedIndex = 0;
 		}
 
 		public static string GetFullName(VSLangProj.Reference reference)
@@ -168,69 +172,99 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			return vsProject;
 		}
 
-		private void ReferencesListPanel_UpdateButton_Click(object sender, RoutedEventArgs e)
+		private void ProjectListPanel_UpdateButton_Click(object sender, RoutedEventArgs e)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 			var form = new MessageBoxWindow();
 			var result = form.ShowDialog("Replace references with projects?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 			if (result != MessageBoxResult.OK)
 				return;
-			UpdateProjectTask(null);
-		}
-
-		public void UpdateProjectTask(object state)
-		{
+			// Set progress controls.
+			_TaskPanel = ProjectListPanel;
+			_TaskButton = ProjectListPanel.UpdateButton;
+			_TaskTopLabel = ProjectListPanel.ProgressLevelTopLabel;
+			_TaskSubLabel = ProjectListPanel.ProgressLevelSubLabel;
+			_TaskTopBar = ProjectListPanel.ProgressLevelTopBar;
+			_TaskSubBar = ProjectListPanel.ProgressLevelSubBar;
+			// Begin.
+			_TaskButton.IsEnabled = false;
 			Global.MainWindow.HMan.AddTask(TaskName.Update);
-			var selectedVsProject = GetSelectedVsProject();
-			if (selectedVsProject == null)
-				return;
-			// Step 1: Create "References" solution folder.
-			var folder = SolutionHelper.GetOrCreateReferencesFolder();
-			// Step 2: Find original projects.
-			foreach (var item in ReferenceList)
+			var success = System.Threading.ThreadPool.QueueUserWorkItem(ProjectUpdateTask);
+			if (!success)
 			{
-				// find project for reference.
-				var projects = Global.ReferenceItems.Items.Where(x => x.ProjectAssemblyName == item.ReferenceName && x.IsProject).ToList();
-				if (projects.Count() > 0)
-				{
-					var p = projects[0];
-					item.ProjectName = p.ProjectName;
-					item.ProjectPath = p.ProjectPath;
-					item.ProjectAssemblyName = p.ProjectAssemblyName;
-					item.StatusCode = MessageBoxImage.Information;
-					item.StatusText = "Project Found";
-				}
+				_TaskTopLabel.Text = "Scan failed!";
+				_TaskSubLabel.Text = "";
+				_TaskPanel.Visibility = Visibility.Visible;
+				_TaskButton.IsEnabled = true;
+				Global.MainWindow.HMan.RemoveTask(TaskName.Update);
 			}
-			var addedProjects = new Dictionary<ReferenceItem, Project>();
-			// Step 3: Add projects to solution.
-			foreach (var item in ReferenceList)
-			{
-				// If project name not available then skip.
-				if (string.IsNullOrEmpty(item.ProjectPath))
-					continue;
-				// If reference path not available then skip.
-				if (string.IsNullOrEmpty(item.ReferencePath))
-					continue;
-				var vsProject = SolutionHelper.GetVsProject(item.ProjectName);
-				// if Project was found inside current solution then...
-				if (vsProject != null)
-					continue;
-				// Add project to solution.
-				var project = folder.AddFromFile(item.ProjectPath);
-				addedProjects.Add(item, project);
-			}
-			// Step 4: Remove References add projects.
-			foreach (var item in addedProjects.Keys)
-			{
-				// Remove reference.
-				var reference = SolutionHelper.GetReference(selectedVsProject, item.ReferenceName);
-				reference.Remove();
-				// Add Project.
-				var project = addedProjects[item];
-				selectedVsProject.References.AddProject(project);
-			}
-			Global.MainWindow.HMan.RemoveTask(TaskName.Update);
 		}
 
+		ProjectUpdater _ProjectUpdater;
+		Button _TaskButton;
+		TextBlock _TaskTopLabel;
+		TextBlock _TaskSubLabel;
+		ProgressBar _TaskTopBar;
+		ProgressBar _TaskSubBar;
+		UIElement _TaskPanel;
+
+		void ProjectUpdateTask(object state)
+		{
+			var projects = new List<VSLangProj.VSProject>();
+			ControlsHelper.Invoke(() =>
+			{
+				_TaskTopLabel.Text = "...";
+				_TaskSubLabel.Text = "";
+				_TaskPanel.Visibility = Visibility.Visible;
+				var project = GetSelectedVsProject();
+				if (project != null)
+					projects.Add(project);
+			});
+			_ProjectUpdater = new ProjectUpdater();
+			_ProjectUpdater.Progress += _ProjectUpdater_Progress;
+			_ProjectUpdater.ProcessData(projects, ReferenceList.ToList());
+		}
+
+		private void _ProjectUpdater_Progress(object sender, ProjectUpdaterEventArgs e)
+		{
+			if (ControlsHelper.InvokeRequired)
+			{
+				ControlsHelper.Invoke(() =>
+					_ProjectUpdater_Progress(sender, e)
+				);
+				return;
+			}
+			var scanner = (ProjectUpdater)sender;
+			switch (e.State)
+			{
+				case ProjectUpdaterStatus.Started:
+					_TaskTopLabel.Text = "Starting...";
+					break;
+				case ProjectUpdaterStatus.Updated:
+					ControlsHelper.Invoke(() =>
+					{
+						_TaskTopLabel.Text = $"{e.TopIndex}/{e.TopCount} - {e.TopMessage}";
+						_TaskTopBar.Value = e.TopIndex;
+						_TaskTopBar.Maximum = e.TopCount;
+						_TaskSubLabel.Text = $"{e.SubIndex}/{e.SubCount} - {e.SubMessage}";
+						_TaskSubBar.Value = e.SubIndex;
+						_TaskSubBar.Maximum = e.SubCount;
+					});
+					break;
+				case ProjectUpdaterStatus.Completed:
+					ControlsHelper.Invoke(() =>
+					{
+						_TaskButton.IsEnabled = true;
+						_TaskPanel.Visibility = Visibility.Collapsed;
+					});
+					ProjectScanner.CashedData.Save();
+					Global.ReferenceItems.Save();
+					_TaskButton.IsEnabled = true;
+					Global.MainWindow.HMan.RemoveTask(TaskName.Update);
+					break;
+				default:
+					break;
+			}
+		}
 	}
 }
