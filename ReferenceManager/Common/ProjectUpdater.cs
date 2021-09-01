@@ -94,7 +94,12 @@ namespace JocysCom.VS.ReferenceManager
 					// If reference path not available then skip.
 					if (string.IsNullOrEmpty(ri.ReferencePath))
 						continue;
-					var vsProject = SolutionHelper.GetVsProject(ri.ProjectName);
+
+					VSLangProj.VSProject vsProject = null;
+					ControlsHelper.Invoke(() =>
+					{
+						vsProject = SolutionHelper.GetVsProject(ri.ProjectName);
+					});
 					// if Project was found inside current solution then...
 					if (vsProject != null)
 						continue;
