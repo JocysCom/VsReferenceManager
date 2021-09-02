@@ -35,8 +35,8 @@ GOTO:EOF
 ::-------------------------------------------------------------
 :: List   symbolic links: dir /A:L
 :: Remote symbolic links: rmdir Skype
-SET upr=c:\Projects\Jocys.com\Class Library
-IF EXIST "D:\Projects\Jocys.com\Class Library" SET SET upr=D:\Projects\Jocys.com\Class Library
+SET upr=C:\Projects\Jocys.com\Class Library
+IF EXIST "D:\Projects\Jocys.com\Class Library" SET upr=D:\Projects\Jocys.com\Class Library
 CALL:MKJ ComponentModel
 CALL:MKJ Configuration
 CALL:MKJ Controls
@@ -62,15 +62,13 @@ GOTO:EOF
 ::=============================================================
 :MKJ
 ::-------------------------------------------------------------
-
-IF NOT EXIST "%~pd1" mkdir "%~pd1"
-IF EXIST "%~1" (
-  echo Already exists: %~1
-) ELSE (
-  echo Map: %~1
-  mklink /J "%~1" "%upr%\%~1" > nul
+DIR /B /A:L | findstr "^%~1$" > nul && (
+  ECHO Link already exists: %~1
+  GOTO:EOF
+) 
+DIR /B /A:D | findstr "^%~1$" > nul && (
+	ECHO Remove directory: %~1
+	RMDIR "%~1"
 )
-GOTO:EOF
-
-
-
+ECHO Map: %~1
+MKLINK /J "%~1" "%upr%\%~1" > nul
