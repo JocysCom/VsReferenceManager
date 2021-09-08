@@ -25,7 +25,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			ProjectListPanel.UpdateButton.Click += ProjectListPanel_UpdateButton_Click;
 			// Trigger references update.
 			ReferenceListPanel.RefreshButton.Click += ReferenceListPanel_RefreshButton_Click;
-			
+			ReferenceListPanel.UpdateButton.Click += ReferenceListPanel_UpdateButton_Click;
 		}
 
 		public SortableBindingList<ReferenceItem> SolutionList
@@ -93,7 +93,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			ControlsHelper.RestoreSelection(grid, key, selection);
 		}
 
-		public void UpdateProjectsFromSelectedSolution()
+		void UpdateProjectsFromSelectedSolution()
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 			var solution = SolutionHelper.GetCurrentSolution();
@@ -131,7 +131,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			ControlsHelper.RestoreSelection(grid, key, selection);
 		}
 
-		public void UpdateReferencesFromSelectedProject()
+		void UpdateReferencesFromSelectedProject()
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 			ReferenceList.Clear();
@@ -215,7 +215,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				return;
 			// Workaround for Visual Studio designer crash.
 			// Move load process to another method or designer will fail when trying to load DTE class.
-			UpdateSolutionFromDTE();
+			UpdateSolution();
 		}
 
 		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
@@ -237,10 +237,45 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		private void ProjectListPanel_UpdateButton_Click(object sender, RoutedEventArgs e)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
+			var arg = new UpdateArgs()
+			{
+				Project = GetSelectedVsProject(),
+				References = ReferenceListPanel.MainDataGrid
+				.Items.Cast<ReferenceItem>().ToList()
+				.Where(x => x.StatusCode == MessageBoxImage.Information).ToList(),
+			};
 			var form = new MessageBoxWindow();
-			var result = form.ShowDialog("Replace references with projects?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+			var result = form.ShowDialog($"Replace {arg.References.Count} references on {arg.Project?.Project?.Name} project?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 			if (result != MessageBoxResult.OK)
 				return;
+			StartUpdate(arg);
+		}
+
+		private void ReferenceListPanel_UpdateButton_Click(object sender, RoutedEventArgs e)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+			var arg = new UpdateArgs()
+			{
+				Project = GetSelectedVsProject(),
+				References = ReferenceListPanel.MainDataGrid
+				.SelectedItems.Cast<ReferenceItem>().ToList()
+				.Where(x => x.StatusCode == MessageBoxImage.Information).ToList(),
+			};
+			var form = new MessageBoxWindow();
+			var result = form.ShowDialog($"Replace {arg.References.Count} selected references on {arg.Project?.Project?.Name} project?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+			if (result != MessageBoxResult.OK)
+				return;
+			StartUpdate(arg);
+		}
+
+		public class UpdateArgs
+		{
+			public List<ReferenceItem> References;
+			public VSLangProj.VSProject Project;
+		}
+
+		void StartUpdate(UpdateArgs state)
+		{
 			// Set progress controls.
 			_TaskPanel = ProjectListPanel;
 			_TaskButton = ProjectListPanel.UpdateButton;
@@ -251,7 +286,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			// Begin.
 			_TaskButton.IsEnabled = false;
 			Global.MainWindow.HMan.AddTask(TaskName.Update);
-			var success = System.Threading.ThreadPool.QueueUserWorkItem(ProjectUpdateTask);
+			var success = System.Threading.ThreadPool.QueueUserWorkItem(ProjectUpdateTask, state);
 			if (!success)
 			{
 				_TaskTopLabel.Text = "Scan failed!";
@@ -272,19 +307,19 @@ namespace JocysCom.VS.ReferenceManager.Controls
 
 		void ProjectUpdateTask(object state)
 		{
+			var arg = (UpdateArgs)state;
 			var projects = new List<VSLangProj.VSProject>();
 			ControlsHelper.Invoke(() =>
 			{
 				_TaskTopLabel.Text = "...";
 				_TaskSubLabel.Text = "";
 				_TaskPanel.Visibility = Visibility.Visible;
-				var project = GetSelectedVsProject();
-				if (project != null)
-					projects.Add(project);
+				if (arg.Project != null)
+					projects.Add(arg.Project);
 			});
 			_ProjectUpdater = new ProjectUpdater();
 			_ProjectUpdater.Progress += _ProjectUpdater_Progress;
-			_ProjectUpdater.ProcessData(projects, ReferenceList.ToList());
+			_ProjectUpdater.ProcessData(projects, arg.References);
 		}
 
 		private void _ProjectUpdater_Progress(object sender, ProjectUpdaterEventArgs e)
@@ -323,6 +358,10 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					Global.ReferenceItems.Save();
 					_TaskButton.IsEnabled = true;
 					Global.MainWindow.HMan.RemoveTask(TaskName.Update);
+					ControlsHelper.BeginInvoke(() =>
+					{
+						UpdateSolution();
+					});
 					break;
 				default:
 					break;

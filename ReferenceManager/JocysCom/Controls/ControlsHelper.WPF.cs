@@ -9,9 +9,7 @@ using System.IO;
 using System.Windows.Documents;
 using System.Collections.Generic;
 using System.Xml;
-using System.Reflection;
 using System.Data;
-using System.Linq;
 
 namespace JocysCom.ClassLibrary.Controls
 {

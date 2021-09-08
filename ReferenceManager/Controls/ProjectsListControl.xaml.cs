@@ -100,7 +100,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				case ProjectsControlType.References:
 					HeadLabel.Content = "References";
 					ShowColumns(StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ReferenceNameColumn, ReferencePathColumn);
-					ShowButtons(ScanButton, RefreshButton);
+					ShowButtons(UpdateButton, RefreshButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_arrow_fork2];
 					break;
 				case ProjectsControlType.ScanResults:
