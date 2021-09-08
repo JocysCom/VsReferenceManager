@@ -111,7 +111,8 @@
 					ScrollViewer.CanContentScroll="True"
 					ScrollViewer.HorizontalScrollBarVisibility="Visible"
 					ScrollViewer.VerticalScrollBarVisibility="Visible"
-					SelectionChanged="MainDataGrid_SelectionChanged">
+					SelectionChanged="MainDataGrid_SelectionChanged"
+					SelectionMode="Extended">
 					<DataGrid.Resources>
 						<converters:ItemFormattingConverter x:Key="_MainDataGridFormattingConverter" />
 					</DataGrid.Resources>

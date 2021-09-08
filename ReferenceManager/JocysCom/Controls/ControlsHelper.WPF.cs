@@ -7,9 +7,11 @@ using System;
 using System.Windows.Media;
 using System.IO;
 using System.Windows.Documents;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Xml;
+using System.Reflection;
+using System.Data;
+using System.Linq;
 
 namespace JocysCom.ClassLibrary.Controls
 {
@@ -648,6 +650,79 @@ namespace JocysCom.ClassLibrary.Controls
 			if (form != null)
 				return form.TopMost;
 			return false;
+		}
+
+		#endregion
+
+		#region Data Grid Functions
+
+		/// <summary>
+		/// Get list of primary keys of items selected in the grid.
+		/// </summary>
+		/// <typeparam name="T">Type of Primary key.</typeparam>
+		/// <param name="grid">Grid for getting selection</param>
+		/// <param name="primaryKeyPropertyName">Primary key name.</param>
+		public static List<T> GetSelection<T>(DataGrid grid, string keyPropertyName = null)
+		{
+			if (grid == null)
+				throw new ArgumentNullException(nameof(grid));
+			var list = new List<T>();
+			var items = grid.SelectedItems.Cast<object>().ToArray();
+			// If nothing selected then try to get rows from cells.
+			if (items.Length == 0)
+				items = grid.SelectedCells.Cast<DataGridCellInfo>().Select(x => x.Item).Distinct().ToArray();
+			// If nothing selected then return.
+			if (items.Length == 0)
+				return list;
+			var pi = GetPropertyInfo(keyPropertyName, items[0]);
+			for (var i = 0; i < items.Length; i++)
+			{
+				var value = GetValue<T>(items[i], keyPropertyName, pi);
+				list.Add(value);
+			}
+			return list;
+		}
+
+		public static void RestoreSelection<T>(DataGrid grid, string keyPropertyName, List<T> list, bool selectFirst = true)
+		{
+			if (grid == null)
+				throw new ArgumentNullException(nameof(grid));
+			if (list == null)
+				throw new ArgumentNullException(nameof(list));
+			var items = grid.Items.Cast<object>().ToArray();
+			// Return if grid is empty.
+			if (items.Length == 0)
+				return;
+			// If something to restore then...
+			if (list.Count > 0)
+			{
+				var selectedItems = new List<object>();
+				var pi = GetPropertyInfo(keyPropertyName, items[0]);
+				for (var i = 0; i < items.Length; i++)
+				{
+					var item = items[i];
+					var val = GetValue<T>(item, keyPropertyName, pi);
+					if (list.Contains(val))
+						selectedItems.Add(item);
+				}
+				if (grid.SelectionMode == DataGridSelectionMode.Single)
+				{
+					grid.SelectedItem = selectedItems.FirstOrDefault();
+				}
+				else
+				{
+					// Remove items which should not be selected.
+					var itemsToUnselect = grid.SelectedItems.Cast<object>().Except(selectedItems);
+					foreach (var item in itemsToUnselect)
+						grid.SelectedItems.Remove(item);
+					var itemsToSelect = selectedItems.Except(grid.SelectedItems.Cast<object>());
+					foreach (var item in itemsToSelect)
+						grid.SelectedItems.Add(item);
+				}
+			}
+			// If must select first row and nothing is selected then...
+			if (selectFirst && grid.SelectedItems.Count == 0)
+				grid.SelectedItem = items[0];
 		}
 
 		#endregion

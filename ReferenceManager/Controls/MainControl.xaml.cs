@@ -17,14 +17,15 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		public MainControl()
 		{
 			InitializeComponent();
+			SolutionListPanel.RefreshButton.Click += SolutionListPanel_RefreshButton_Click;
 			SolutionListPanel.MainDataGrid.SelectionChanged += SolutionListPanel_MainDataGrid_SelectionChanged;
-			ProjectListPanel.MainDataGrid.SelectionChanged += ProjectsListPanel_MainDataGrid_SelectionChanged;
+			// Trigger projects update.
+			ProjectListPanel.RefreshButton.Click += ProjectListPanel_RefreshButton_Click;
+			ProjectListPanel.MainDataGrid.SelectionChanged += ProjectListPanel_MainDataGrid_SelectionChanged;
 			ProjectListPanel.UpdateButton.Click += ProjectListPanel_UpdateButton_Click;
-		}
-
-		private void SolutionListPanel_MainDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			UpdateProjects();
+			// Trigger references update.
+			ReferenceListPanel.RefreshButton.Click += ReferenceListPanel_RefreshButton_Click;
+			
 		}
 
 		public SortableBindingList<ReferenceItem> SolutionList
@@ -36,25 +37,33 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		public SortableBindingList<ReferenceItem> ReferenceList
 			=> ReferenceListPanel.ReferenceList;
 
-		/// <summary>
-		/// Handles click on the button by displaying a message box.
-		/// </summary>
-		/// <param name="sender">The event sender.</param>
-		/// <param name="e">The event args.</param>
-		[SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions", Justification = "Sample code")]
-		[SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Default event handler naming pattern")]
-		private void RefreshButton_Click(object sender, RoutedEventArgs e)
-		{
-			ThreadHelper.ThrowIfNotOnUIThread();
-			UpdateProjects();
-		}
+		private void SolutionListPanel_RefreshButton_Click(object sender, RoutedEventArgs e)
+			=> UpdateSolution();
 
-		private void ProjectsListPanel_MainDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			UpdateReferences();
-		}
+		private void SolutionListPanel_MainDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+			=> UpdateProjects();
+
+		private void ProjectListPanel_RefreshButton_Click(object sender, RoutedEventArgs e)
+			=> UpdateProjects();
+
+		private void ProjectListPanel_MainDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+			=> UpdateReferences();
+
+		private void ReferenceListPanel_RefreshButton_Click(object sender, RoutedEventArgs e)
+			=> UpdateReferences();
+
+		#region Update Solution 
 
 		void UpdateSolution()
+		{
+			var grid = SolutionListPanel.MainDataGrid;
+			var key = nameof(ReferenceItem.SolutionName);
+			var selection = ControlsHelper.GetSelection<string>(grid, key);
+			UpdateSolutionFromDTE();
+			ControlsHelper.RestoreSelection(grid, key, selection);
+		}
+
+		void UpdateSolutionFromDTE()
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 			SolutionList.Clear();
@@ -69,11 +78,22 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			};
 			// This is a project reference
 			SolutionList.Add(item);
-			if (SolutionList.Count > 0)
-				SolutionListPanel.MainDataGrid.SelectedIndex = 0;
 		}
 
-		public void UpdateProjects()
+		#endregion
+
+		#region Update Projects
+
+		void UpdateProjects()
+		{
+			var grid = ProjectListPanel.MainDataGrid;
+			var key = nameof(ReferenceItem.ProjectName);
+			var selection = ControlsHelper.GetSelection<string>(grid, key);
+			UpdateProjectsFromSelectedSolution();
+			ControlsHelper.RestoreSelection(grid, key, selection);
+		}
+
+		public void UpdateProjectsFromSelectedSolution()
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 			var solution = SolutionHelper.GetCurrentSolution();
@@ -95,11 +115,23 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					ProjectList.Add(item);
 				}
 			}
-			if (ProjectList.Count > 0)
-				ProjectListPanel.MainDataGrid.SelectedIndex = 0;
 		}
 
-		public void UpdateReferences()
+		#endregion
+
+		#region Update References
+
+		void UpdateReferences()
+		{
+			var grid = ReferenceListPanel.MainDataGrid;
+			var key = nameof(ReferenceItem.ReferenceName);
+			var selection = ControlsHelper.GetSelection<string>(grid, key);
+			UpdateReferencesFromSelectedProject();
+			UpdateReferences_FindProjects();
+			ControlsHelper.RestoreSelection(grid, key, selection);
+		}
+
+		public void UpdateReferencesFromSelectedProject()
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 			ReferenceList.Clear();
@@ -133,9 +165,39 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					ReferenceList.Add(item);
 				}
 			}
-			if (ReferenceList.Count > 0)
-				ReferenceListPanel.MainDataGrid.SelectedIndex = 0;
 		}
+
+		void UpdateReferences_FindProjects()
+		{
+			for (int r = 0; r < ReferenceList.Count; r++)
+			{
+				var ri = ReferenceList[r];
+				// Find project for reference.
+				var refProjects = Global.ReferenceItems.Items.Where(x => x.ProjectAssemblyName == ri.ReferenceName && x.IsProject).ToList();
+				if (refProjects.Count() == 1)
+				{
+					ControlsHelper.Invoke(() =>
+					{
+						var refProject = refProjects[0];
+						ri.ProjectName = refProject.ProjectName;
+						ri.ProjectPath = refProject.ProjectPath;
+						ri.ProjectAssemblyName = refProject.ProjectAssemblyName;
+						ri.StatusCode = MessageBoxImage.Information;
+						ri.StatusText = "Project Found";
+					});
+				}
+				else if (refProjects.Count() > 1)
+				{
+					ControlsHelper.Invoke(() =>
+					{
+						ri.StatusCode = MessageBoxImage.Warning;
+						ri.StatusText = "Multiple Projects found";
+					});
+				}
+			}
+		}
+
+		#endregion
 
 		public static string GetFullName(VSLangProj.Reference reference)
 		{
@@ -153,7 +215,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				return;
 			// Workaround for Visual Studio designer crash.
 			// Move load process to another method or designer will fail when trying to load DTE class.
-			UpdateSolution();
+			UpdateSolutionFromDTE();
 		}
 
 		private void UserControl_Unloaded(object sender, RoutedEventArgs e)

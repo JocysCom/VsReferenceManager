@@ -6,7 +6,6 @@ using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 
 namespace JocysCom.VS.ReferenceManager
 {
@@ -49,35 +48,6 @@ namespace JocysCom.VS.ReferenceManager
 					e.ClearSub();
 					Report(e);
 				});
-				// Step 1: Find original projects.
-				e.SubMessage = $"Step 1: Find References...";
-				Report(e);
-				for (int r = 0; r < references.Count; r++)
-				{
-					var ri = references[r];
-					// find project for reference.
-					var refProjects = Global.ReferenceItems.Items.Where(x => x.ProjectAssemblyName == ri.ReferenceName && x.IsProject).ToList();
-					if (refProjects.Count() == 1)
-					{
-						ControlsHelper.Invoke(() =>
-						{
-							var refProject = refProjects[0];
-							ri.ProjectName = refProject.ProjectName;
-							ri.ProjectPath = refProject.ProjectPath;
-							ri.ProjectAssemblyName = refProject.ProjectAssemblyName;
-							ri.StatusCode = MessageBoxImage.Information;
-							ri.StatusText = "Project Found";
-						});
-					}
-					else if (refProjects.Count() > 1)
-					{
-						ControlsHelper.Invoke(() =>
-						{
-							ri.StatusCode = MessageBoxImage.Warning;
-							ri.StatusText = "Multiple Projects found";
-						});
-					}
-				}
 				var addedProjects = new Dictionary<ReferenceItem, Project>();
 				// Step 2: Add projects to solution.
 				for (int r = 0; r < references.Count; r++)
