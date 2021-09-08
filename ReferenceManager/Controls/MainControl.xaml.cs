@@ -278,13 +278,16 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		{
 			// Set progress controls.
 			_TaskPanel = ProjectListPanel;
-			_TaskButton = ProjectListPanel.UpdateButton;
+			_TaskButtons.Clear();
+			_TaskButtons.Add(ProjectListPanel.UpdateButton);
+			_TaskButtons.Add(ReferenceListPanel.UpdateButton);
 			_TaskTopLabel = ProjectListPanel.ProgressLevelTopLabel;
 			_TaskSubLabel = ProjectListPanel.ProgressLevelSubLabel;
 			_TaskTopBar = ProjectListPanel.ProgressLevelTopBar;
 			_TaskSubBar = ProjectListPanel.ProgressLevelSubBar;
 			// Begin.
-			_TaskButton.IsEnabled = false;
+			foreach (var button in _TaskButtons)
+				button.IsEnabled = false;
 			Global.MainWindow.HMan.AddTask(TaskName.Update);
 			var success = System.Threading.ThreadPool.QueueUserWorkItem(ProjectUpdateTask, state);
 			if (!success)
@@ -292,13 +295,14 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				_TaskTopLabel.Text = "Scan failed!";
 				_TaskSubLabel.Text = "";
 				_TaskPanel.Visibility = Visibility.Visible;
-				_TaskButton.IsEnabled = true;
+				foreach (var button in _TaskButtons)
+					button.IsEnabled = true;
 				Global.MainWindow.HMan.RemoveTask(TaskName.Update);
 			}
 		}
 
 		ProjectUpdater _ProjectUpdater;
-		Button _TaskButton;
+		List<Button> _TaskButtons = new List<Button>();
 		TextBlock _TaskTopLabel;
 		TextBlock _TaskSubLabel;
 		ProgressBar _TaskTopBar;
@@ -351,12 +355,14 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				case ProjectUpdaterStatus.Completed:
 					ControlsHelper.Invoke(() =>
 					{
-						_TaskButton.IsEnabled = true;
+						foreach (var button in _TaskButtons)
+							button.IsEnabled = true;
 						_TaskPanel.Visibility = Visibility.Collapsed;
 					});
 					ProjectScanner.CashedData.Save();
 					Global.ReferenceItems.Save();
-					_TaskButton.IsEnabled = true;
+					foreach (var button in _TaskButtons)
+						button.IsEnabled = true;
 					Global.MainWindow.HMan.RemoveTask(TaskName.Update);
 					ControlsHelper.BeginInvoke(() =>
 					{

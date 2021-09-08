@@ -128,7 +128,10 @@
 				<Setter Property="Template">
 					<Setter.Value>
 						<ControlTemplate TargetType="TabItem">
-							<Border Name="TiBorder" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" BorderThickness="1,1,1,1">
+							<Border
+								Name="TiBorder"
+								BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+								BorderThickness="1,1,1,1">
 								<ContentPresenter
 									Name="TiContent"
 									HorizontalAlignment="Center"
@@ -222,7 +225,10 @@
 
 	<!--  TextBox - Cell  -->
 
-	<Style x:Key="TextBoxCell" BasedOn="{StaticResource TextBox_Default}" TargetType="TextBox">
+	<Style
+		x:Key="TextBoxCell"
+		BasedOn="{StaticResource TextBox_Default}"
+		TargetType="TextBox">
 		<Setter Property="BorderThickness" Value="0" />
 		<Setter Property="Height" Value="Auto" />
 		<Setter Property="Padding" Value="1,4,1,2" />
@@ -230,12 +236,18 @@
 		<Setter Property="VerticalAlignment" Value="Center" />
 	</Style>
 
-	<Style x:Key="TextBoxRightCell" BasedOn="{StaticResource TextBoxCell}" TargetType="TextBox">
+	<Style
+		x:Key="TextBoxRightCell"
+		BasedOn="{StaticResource TextBoxCell}"
+		TargetType="TextBox">
 		<Setter Property="HorizontalAlignment" Value="Stretch" />
 		<Setter Property="TextAlignment" Value="Right" />
 	</Style>
 
-	<Style x:Key="TextBoxCenterCell" BasedOn="{StaticResource TextBoxCell}" TargetType="TextBox">
+	<Style
+		x:Key="TextBoxCenterCell"
+		BasedOn="{StaticResource TextBoxCell}"
+		TargetType="TextBox">
 		<Setter Property="HorizontalAlignment" Value="Stretch" />
 		<Setter Property="TextAlignment" Value="Center" />
 	</Style>
@@ -254,24 +266,36 @@
 
 	<!--  TextBlock - Cell  -->
 
-	<Style x:Key="TextBlockCell" BasedOn="{StaticResource TextBlock_Default}" TargetType="TextBlock">
+	<Style
+		x:Key="TextBlockCell"
+		BasedOn="{StaticResource TextBlock_Default}"
+		TargetType="TextBlock">
 		<Setter Property="Padding" Value="3,4,3,2" />
 		<Setter Property="Margin" Value="0,0,0,0" />
 	</Style>
 
-	<Style x:Key="TextBlockLeftCell" BasedOn="{StaticResource TextBlockCell}" TargetType="TextBlock">
+	<Style
+		x:Key="TextBlockLeftCell"
+		BasedOn="{StaticResource TextBlockCell}"
+		TargetType="TextBlock">
 		<Setter Property="HorizontalAlignment" Value="Stretch" />
 		<Setter Property="TextAlignment" Value="Left" />
 		<Setter Property="VerticalAlignment" Value="Center" />
 	</Style>
 
-	<Style x:Key="TextBlockRightCell" BasedOn="{StaticResource TextBlockCell}" TargetType="TextBlock">
+	<Style
+		x:Key="TextBlockRightCell"
+		BasedOn="{StaticResource TextBlockCell}"
+		TargetType="TextBlock">
 		<Setter Property="HorizontalAlignment" Value="Stretch" />
 		<Setter Property="TextAlignment" Value="Right" />
 		<Setter Property="VerticalAlignment" Value="Center" />
 	</Style>
 
-	<Style x:Key="TextBlockCenterCell" BasedOn="{StaticResource TextBlockCell}" TargetType="TextBlock">
+	<Style
+		x:Key="TextBlockCenterCell"
+		BasedOn="{StaticResource TextBlockCell}"
+		TargetType="TextBlock">
 		<Setter Property="HorizontalAlignment" Value="Stretch" />
 		<Setter Property="TextAlignment" Value="Center" />
 		<Setter Property="VerticalAlignment" Value="Center" />
@@ -327,7 +351,10 @@
 		</Style.Resources>
 	</Style>
 
-	<Style x:Key="DataGridReadOnly" BasedOn="{StaticResource DataGrid_Default}" TargetType="DataGrid">
+	<Style
+		x:Key="DataGridReadOnly"
+		BasedOn="{StaticResource DataGrid_Default}"
+		TargetType="DataGrid">
 		<Setter Property="RowBackground" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
 		<Setter Property="IsReadOnly" Value="true" />
 		<Setter Property="BorderThickness" Value="1,0,0,0" />
@@ -353,7 +380,10 @@
 
 	<!--  ComboBox - Grid  -->
 
-	<Style x:Key="ComboBoxGrid" BasedOn="{StaticResource ComboBox_Default}" TargetType="ComboBox">
+	<Style
+		x:Key="ComboBoxGrid"
+		BasedOn="{StaticResource ComboBox_Default}"
+		TargetType="ComboBox">
 		<Setter Property="Padding" Value="3,3,3,3" />
 		<Setter Property="Margin" Value="3,3,3,3" />
 		<Setter Property="HorizontalAlignment" Value="Left" />
@@ -378,7 +408,10 @@
 	<!--  CheckBox - Cell  -->
 
 
-	<Style x:Key="CheckBoxCell" BasedOn="{StaticResource CheckBox_Default}" TargetType="CheckBox">
+	<Style
+		x:Key="CheckBoxCell"
+		BasedOn="{StaticResource CheckBox_Default}"
+		TargetType="CheckBox">
 		<Setter Property="Margin" Value="3,0,3,0" />
 		<Setter Property="Padding" Value="0,0,0,0" />
 		<Setter Property="VerticalAlignment" Value="Center" />
@@ -459,7 +492,10 @@
 		<Setter Property="HeaderTemplate">
 			<Setter.Value>
 				<DataTemplate>
-					<TextBlock Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Style="{StaticResource TextBlock_Default}" Text="{Binding}" />
+					<TextBlock
+						Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+						Style="{StaticResource TextBlock_Default}"
+						Text="{Binding}" />
 				</DataTemplate>
 			</Setter.Value>
 		</Setter>
