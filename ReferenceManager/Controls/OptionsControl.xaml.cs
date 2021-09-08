@@ -44,8 +44,6 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				{
 					if (!Contains(fbd.SelectedPath))
 					{
-						if (Global.AppSettings.ScanLocations == null)
-							Global.AppSettings.ScanLocations = new ClassLibrary.ComponentModel.SortableBindingList<string>();
 						Global.AppSettings.ScanLocations.Add(fbd.SelectedPath);
 						Global.AppData.Save();
 						// Change selected index for change event to fire.
