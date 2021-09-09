@@ -125,20 +125,20 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			var grid = ReferenceListPanel.MainDataGrid;
 			var key = nameof(ReferenceItem.ReferenceName);
 			var selection = ControlsHelper.GetSelection<string>(grid, key);
-			UpdateReferencesFromSelectedProject();
-			UpdateReferences_FindProjects();
+			var selectedProject = (ReferenceItem)ProjectListPanel.MainDataGrid.SelectedItem;
+			FillReferencesFromSelectedProject(selectedProject, ReferenceList);
+			UpdateReferences_FindProjects(ReferenceList);
 			ControlsHelper.RestoreSelection(grid, key, selection);
 		}
 
-		void UpdateReferencesFromSelectedProject()
+		void FillReferencesFromSelectedProject(ReferenceItem project, IList<ReferenceItem> references)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
-			ReferenceList.Clear();
+			references.Clear();
 			var solution = SolutionHelper.GetCurrentSolution();
-			var selectedProject = (ReferenceItem)ProjectListPanel.MainDataGrid.SelectedItem;
-			if (selectedProject == null)
+			if (project == null)
 				return;
-			var p = (VSLangProj.VSProject)selectedProject.Tag;
+			var p = (VSLangProj.VSProject)project.Tag;
 			foreach (VSLangProj.Reference reference in p.References)
 			{
 				if (reference.SourceProject == null)
@@ -149,9 +149,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 						ReferenceName = reference.Name,
 						ReferencePath = reference.Path,
 					};
-					ReferenceList.Add(item);
-					//var fullName = GetFullName(reference);
-					//var assemblyName = new AssemblyName(fullName);
+					references.Add(item);
 				}
 				else
 				{
@@ -161,16 +159,16 @@ namespace JocysCom.VS.ReferenceManager.Controls
 						ProjectName = reference.Name,
 						ProjectPath = reference.Path,
 					};
-					ReferenceList.Add(item);
+					references.Add(item);
 				}
 			}
 		}
 
-		void UpdateReferences_FindProjects()
+		void UpdateReferences_FindProjects(IList<ReferenceItem> references)
 		{
-			for (int r = 0; r < ReferenceList.Count; r++)
+			for (int r = 0; r < references.Count; r++)
 			{
-				var ri = ReferenceList[r];
+				var ri = references[r];
 				// Find project for reference.
 				var refProjects = Global.ReferenceItems.Items.Where(x => x.ProjectAssemblyName == ri.ReferenceName && x.IsProject).ToList();
 				if (refProjects.Count() == 1)
@@ -236,44 +234,70 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		private void ProjectListPanel_UpdateButton_Click(object sender, RoutedEventArgs e)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
-			var arg = new UpdateArgs()
+			var param = new ProjectUpdaterParam();
+			bool containsChecked;
+			var projectItems = GetCheckedOrSelectedReferences(ProjectListPanel, out containsChecked);
+			int referenceCount = 0;
+			foreach (var projectItem in projectItems)
 			{
-				Project = GetSelectedVsProject(),
-				References = ReferenceListPanel.MainDataGrid
-				.Items.Cast<ReferenceItem>().ToList()
-				.Where(x => x.StatusCode == MessageBoxImage.Information).ToList(),
+				// Create list to gather information about references.
+				var references = new List<ReferenceItem>();
+				// Fill list with reference projects.
+				FillReferencesFromSelectedProject(projectItem, references);
+				// Mark records which can be updated.
+				UpdateReferences_FindProjects(references);
+				// Leave only updatable records i.e. records which have "Information" status code.
+				references = references.Where(x => x.StatusCode == MessageBoxImage.Information).ToList();
+				// Get Visual studio objects.
+				var project = SolutionHelper.GetVsProject(projectItem.ProjectName);
+				param.Data.Add(project, references);
+				referenceCount += references.Count;
 			};
 			var form = new MessageBoxWindow();
-			var result = form.ShowDialog($"Replace {arg.References.Count} references on {arg.Project?.Project?.Name} project?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+			var result = form.ShowDialog($"Replace {referenceCount} references on {param.Data.Keys.Count} projects?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 			if (result != MessageBoxResult.OK)
 				return;
-			StartUpdate(arg);
+			StartUpdate(param);
 		}
 
 		private void ReferenceListPanel_UpdateButton_Click(object sender, RoutedEventArgs e)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
-			var arg = new UpdateArgs()
-			{
-				Project = GetSelectedVsProject(),
-				References = ReferenceListPanel.MainDataGrid
-				.SelectedItems.Cast<ReferenceItem>().ToList()
-				.Where(x => x.StatusCode == MessageBoxImage.Information).ToList(),
-			};
+			var args = new ProjectUpdaterParam();
+			var project = GetSelectedVsProject();
+			bool containsChecked;
+			var references = GetCheckedOrSelectedReferences(ReferenceListPanel, out containsChecked);
+			var action = containsChecked ? "Checked" : "Selected";
+			args.Data.Add(project, references);
 			var form = new MessageBoxWindow();
-			var result = form.ShowDialog($"Replace {arg.References.Count} selected references on {arg.Project?.Project?.Name} project?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+			var result = form.ShowDialog($"Replace {references.Count} {action} references on {project?.Project?.Name} project?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 			if (result != MessageBoxResult.OK)
 				return;
-			StartUpdate(arg);
+			StartUpdate(args);
 		}
 
-		public class UpdateArgs
+		List<ReferenceItem> GetCheckedOrSelectedReferences(ProjectsListControl control, out bool containsChecked)
 		{
-			public List<ReferenceItem> References;
-			public VSLangProj.VSProject Project;
+			List<ReferenceItem> references; 
+			var list = control.ReferenceList;
+			containsChecked = list.Any(x => x.IsChecked);
+			// If some records are checked then...
+			if (containsChecked)
+			{
+				// Select CHECKED records.
+			   references = list.Where(x => x.StatusCode == MessageBoxImage.Information).ToList();
+			}
+			else
+			{
+				// Select SELECTED records.
+				references = control.MainDataGrid
+				.SelectedItems.Cast<ReferenceItem>().ToList()
+				.Where(x => x.StatusCode == MessageBoxImage.Information).ToList();
+			}
+			return references;
 		}
 
-		void StartUpdate(UpdateArgs state)
+		void StartUpdate(ProjectUpdaterParam state)
 		{
 			// Set progress controls.
 			_TaskPanel = ProjectListPanel.ScanProgressPanel;
@@ -302,19 +326,17 @@ namespace JocysCom.VS.ReferenceManager.Controls
 
 		void ProjectUpdateTask(object state)
 		{
-			var arg = (UpdateArgs)state;
 			var projects = new List<VSLangProj.VSProject>();
 			ControlsHelper.Invoke(() =>
 			{
 				_TaskTopLabel.Text = "...";
 				_TaskSubLabel.Text = "";
 				_TaskPanel.Visibility = Visibility.Visible;
-				if (arg.Project != null)
-					projects.Add(arg.Project);
 			});
 			_ProjectUpdater = new ProjectUpdater();
 			_ProjectUpdater.Progress += _ProjectUpdater_Progress;
-			_ProjectUpdater.ProcessData(projects, arg.References);
+			var param = (ProjectUpdaterParam)state;
+			_ProjectUpdater.ProcessData(param);
 		}
 
 		private void _ProjectUpdater_Progress(object sender, ProjectUpdaterEventArgs e)
@@ -353,8 +375,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					Global.MainWindow.HMan.RemoveTask(TaskName.Update);
 					ControlsHelper.BeginInvoke(() =>
 					{
-						//UpdateSolution();
-						//UpdateProjects();
+						UpdateSolution();
+						UpdateProjects();
 						UpdateReferences();
 					});
 					break;

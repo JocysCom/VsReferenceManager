@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace JocysCom.VS.ReferenceManager
 {
+
 	public partial class ProjectUpdater : IProgress<ProjectUpdaterEventArgs>
 	{
 
@@ -21,7 +22,7 @@ namespace JocysCom.VS.ReferenceManager
 
 		#endregion
 
-		public void ProcessData(List<VSLangProj.VSProject> projects, List<ReferenceItem> references)
+		public void ProcessData(ProjectUpdaterParam param)
 		{
 			var e = new ProjectUpdaterEventArgs();
 			// Create "References" solution folder.
@@ -33,6 +34,8 @@ namespace JocysCom.VS.ReferenceManager
 			{
 				folder = SolutionHelper.GetOrCreateReferencesFolder();
 			});
+			var projects = param.Data.Keys.ToList();
+
 			for (int p = 0; p < projects.Count; p++)
 			{
 				VSLangProj.VSProject project = null;
@@ -49,6 +52,7 @@ namespace JocysCom.VS.ReferenceManager
 					Report(e);
 				});
 				var addedProjects = new Dictionary<ReferenceItem, Project>();
+				var references = param.Data[project];
 				// Step 2: Add projects to solution.
 				for (int r = 0; r < references.Count; r++)
 				{

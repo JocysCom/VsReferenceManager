@@ -40,6 +40,13 @@ namespace JocysCom.VS.ReferenceManager
 		public System.Windows.MessageBoxImage StatusCode { get => _StatusCode; set => SetProperty(ref _StatusCode, value); }
 		System.Windows.MessageBoxImage _StatusCode;
 
+		public bool IsChecked
+		{
+			get => _IsChecked;
+			set => SetProperty(ref _IsChecked, value);
+		}
+		bool _IsChecked;
+
 		public bool IsEnabled { get => _IsEnabled; set => SetProperty(ref _IsEnabled, value); }
 		bool _IsEnabled;
 

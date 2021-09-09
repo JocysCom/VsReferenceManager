@@ -38,17 +38,38 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		private void Tasks_ListChanged(object sender, ListChangedEventArgs e)
 			=> UpdateUpdateButton();
 
+		bool selectionsUpdating = false;
 		private void ReferenceList_ListChanged(object sender, ListChangedEventArgs e)
 		{
 			ControlsHelper.BeginInvoke(() =>
 			{
-				UpdateHeaderFromList();
+				UpdateControlsFromList();
+				if (e.ListChangedType == ListChangedType.ItemChanged)
+				{
+					if (!selectionsUpdating && e.PropertyDescriptor?.Name == nameof(ReferenceItem.IsChecked))
+					{
+						selectionsUpdating = true;
+						var selectedItems = MainDataGrid.SelectedItems.Cast<ReferenceItem>().ToList();
+						// Get updated item.
+						var item = (ReferenceItem)MainDataGrid.Items[e.NewIndex];
+						if (selectedItems.Contains(item))
+						{
+							// Update other items to same value.
+							selectedItems.Remove(item);
+							foreach (var selecetdItem in selectedItems)
+								if (selecetdItem.IsChecked != item.IsChecked)
+									selecetdItem.IsChecked = item.IsChecked;
+						}
+						selectionsUpdating = false;
+					}
+				}
 			});
 		}
 
-		void UpdateHeaderFromList()
+		void UpdateControlsFromList()
 		{
 			var list = ReferenceList;
+			var updatable = 0;
 			var count = list.Count;
 			var s = "";
 			switch (ProjectsControlType)
@@ -61,6 +82,11 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					break;
 				case ProjectsControlType.References:
 					s += "References";
+					updatable = list.Count(x => x.StatusCode == MessageBoxImage.Information);
+					var containsChecked = list.Any(x => x.IsChecked);
+					var action = containsChecked ? "Checked" : "Selected";
+					var bn = $"Update {action} References To Projects";
+					ControlsHelper.SetText(UpdateButtonLabel, bn);
 					break;
 				case ProjectsControlType.ScanResults:
 					s += "Scan Results";
@@ -70,6 +96,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			}
 			if (count > 0)
 				s += $" ({count})";
+			if (updatable > 0)
+				s += $" Updatable ({updatable})";
 			ControlsHelper.SetText(HeadLabel, s);
 		}
 
@@ -125,20 +153,20 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			{
 				case ProjectsControlType.Solution:
 					HeadLabel.Content = "Solution";
-					ShowColumns(StatusCodeColumn, StatusTextColumn, SolutionNameColumn, SolutionPathColumn);
+					ShowColumns(SolutionNameColumn, SolutionPathColumn);
 					ShowButtons(RefreshButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_Visual_Studio];
 					break;
 				case ProjectsControlType.Projects:
 					HeadLabel.Content = "Projects";
-					ShowColumns(StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ProjectPathColumn);
+					ShowColumns(IsCheckedColumn, StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ProjectPathColumn);
 					ShowButtons(UpdateButton, RefreshButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_windows];
 					break;
 				case ProjectsControlType.References:
 					HeadLabel.Content = "References";
 					UpdateButtonLabel.Content = "Update Selected References To Projects";
-					ShowColumns(StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ReferenceNameColumn, ReferencePathColumn);
+					ShowColumns(IsCheckedColumn, StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ReferenceNameColumn, ReferencePathColumn);
 					ShowButtons(UpdateButton, RefreshButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_arrow_fork2];
 					break;
@@ -151,17 +179,17 @@ namespace JocysCom.VS.ReferenceManager.Controls
 						if (ReferenceList.Count > 0)
 							MainDataGrid.SelectedIndex = 0;
 					}
-					ShowColumns(StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ProjectAssemblyNameColumn, ReferenceNameColumn, ReferencePathColumn);
+					ShowColumns(ProjectNameColumn, ProjectAssemblyNameColumn, ReferenceNameColumn, ReferencePathColumn);
 					ShowButtons(ScanButton, ExportButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_clipboard_checks];
 					break;
 				default:
 					break;
 			}
-			// Reattach events and update header.
+			// Re-attach events and update header.
 			ReferenceList.ListChanged -= ReferenceList_ListChanged;
 			ReferenceList.ListChanged += ReferenceList_ListChanged;
-			UpdateHeaderFromList();
+			UpdateControlsFromList();
 		}
 
 		public void ShowColumns(params DataGridColumn[] args)
@@ -344,7 +372,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				// Count updatable references.
 				allowEnable = MainDataGrid.SelectedItems.Cast<ReferenceItem>()
 					.Count(x => x.StatusCode == MessageBoxImage.Information) > 0;
-			
+
 			}
 			var isBusy = (Global.MainWindow?.HMan?.Tasks?.Count ?? 0) > 0;
 			UpdateButton.IsEnabled = !isBusy && allowEnable;

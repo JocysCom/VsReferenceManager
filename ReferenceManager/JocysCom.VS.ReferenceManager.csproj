@@ -55,6 +55,7 @@
     <Compile Include="Common\ProjectsControlType.cs" />
     <Compile Include="Common\ProjectUpdater.cs" />
     <Compile Include="Common\ProjectUpdaterEventArgs.cs" />
+    <Compile Include="Common\ProjectUpdaterParam.cs" />
     <Compile Include="Common\ProjectUpdaterStatus.cs" />
     <Compile Include="Common\ReferenceItem.cs" />
     <Compile Include="Common\SolutionHelper.cs" />
