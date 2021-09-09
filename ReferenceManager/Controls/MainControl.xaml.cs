@@ -2,7 +2,6 @@
 using JocysCom.ClassLibrary.Controls;
 using Microsoft.VisualStudio.Shell;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -277,17 +276,12 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		void StartUpdate(UpdateArgs state)
 		{
 			// Set progress controls.
-			_TaskPanel = ProjectListPanel;
-			_TaskButtons.Clear();
-			_TaskButtons.Add(ProjectListPanel.UpdateButton);
-			_TaskButtons.Add(ReferenceListPanel.UpdateButton);
+			_TaskPanel = ProjectListPanel.ScanProgressPanel;
 			_TaskTopLabel = ProjectListPanel.ProgressLevelTopLabel;
 			_TaskSubLabel = ProjectListPanel.ProgressLevelSubLabel;
 			_TaskTopBar = ProjectListPanel.ProgressLevelTopBar;
 			_TaskSubBar = ProjectListPanel.ProgressLevelSubBar;
 			// Begin.
-			foreach (var button in _TaskButtons)
-				button.IsEnabled = false;
 			Global.MainWindow.HMan.AddTask(TaskName.Update);
 			var success = System.Threading.ThreadPool.QueueUserWorkItem(ProjectUpdateTask, state);
 			if (!success)
@@ -295,14 +289,11 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				_TaskTopLabel.Text = "Scan failed!";
 				_TaskSubLabel.Text = "";
 				_TaskPanel.Visibility = Visibility.Visible;
-				foreach (var button in _TaskButtons)
-					button.IsEnabled = true;
 				Global.MainWindow.HMan.RemoveTask(TaskName.Update);
 			}
 		}
 
 		ProjectUpdater _ProjectUpdater;
-		List<Button> _TaskButtons = new List<Button>();
 		TextBlock _TaskTopLabel;
 		TextBlock _TaskSubLabel;
 		ProgressBar _TaskTopBar;
@@ -355,18 +346,16 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				case ProjectUpdaterStatus.Completed:
 					ControlsHelper.Invoke(() =>
 					{
-						foreach (var button in _TaskButtons)
-							button.IsEnabled = true;
 						_TaskPanel.Visibility = Visibility.Collapsed;
 					});
 					ProjectScanner.CashedData.Save();
 					Global.ReferenceItems.Save();
-					foreach (var button in _TaskButtons)
-						button.IsEnabled = true;
 					Global.MainWindow.HMan.RemoveTask(TaskName.Update);
 					ControlsHelper.BeginInvoke(() =>
 					{
-						UpdateSolution();
+						//UpdateSolution();
+						//UpdateProjects();
+						UpdateReferences();
 					});
 					break;
 				default:

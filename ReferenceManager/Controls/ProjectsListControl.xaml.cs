@@ -35,6 +35,44 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			gridFormattingConverter.ConvertFunction = _MainDataGridFormattingConverter_Convert;
 		}
 
+		private void Tasks_ListChanged(object sender, ListChangedEventArgs e)
+			=> UpdateUpdateButton();
+
+		private void ReferenceList_ListChanged(object sender, ListChangedEventArgs e)
+		{
+			ControlsHelper.BeginInvoke(() =>
+			{
+				UpdateHeaderFromList();
+			});
+		}
+
+		void UpdateHeaderFromList()
+		{
+			var list = ReferenceList;
+			var count = list.Count;
+			var s = "";
+			switch (ProjectsControlType)
+			{
+				case ProjectsControlType.Solution:
+					s += "Solution";
+					break;
+				case ProjectsControlType.Projects:
+					s += "Projects";
+					break;
+				case ProjectsControlType.References:
+					s += "References";
+					break;
+				case ProjectsControlType.ScanResults:
+					s += "Scan Results";
+					break;
+				default:
+					break;
+			}
+			if (count > 0)
+				s += $" ({count})";
+			ControlsHelper.SetText(HeadLabel, s);
+		}
+
 		object _MainDataGridFormattingConverter_Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
 		{
 			var sender = (FrameworkElement)values[0];
@@ -99,6 +137,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					break;
 				case ProjectsControlType.References:
 					HeadLabel.Content = "References";
+					UpdateButtonLabel.Content = "Update Selected References To Projects";
 					ShowColumns(StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ReferenceNameColumn, ReferencePathColumn);
 					ShowButtons(UpdateButton, RefreshButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_arrow_fork2];
@@ -119,6 +158,10 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				default:
 					break;
 			}
+			// Reattach events and update header.
+			ReferenceList.ListChanged -= ReferenceList_ListChanged;
+			ReferenceList.ListChanged += ReferenceList_ListChanged;
+			UpdateHeaderFromList();
 		}
 
 		public void ShowColumns(params DataGridColumn[] args)
@@ -291,13 +334,20 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		}
 
 		private void MainDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+			=> UpdateUpdateButton();
+
+		void UpdateUpdateButton()
 		{
-
-		}
-
-		private void RefreshButton_Click(object sender, RoutedEventArgs e)
-		{
-
+			var allowEnable = true;
+			if (ProjectsControlType == ProjectsControlType.References)
+			{
+				// Count updatable references.
+				allowEnable = MainDataGrid.SelectedItems.Cast<ReferenceItem>()
+					.Count(x => x.StatusCode == MessageBoxImage.Information) > 0;
+			
+			}
+			var isBusy = (Global.MainWindow?.HMan?.Tasks?.Count ?? 0) > 0;
+			UpdateButton.IsEnabled = !isBusy && allowEnable;
 		}
 
 		/// <summary>
@@ -320,5 +370,12 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			return table;
 		}
 
+		private void UserControl_Loaded(object sender, RoutedEventArgs e)
+		{
+			if (ControlsHelper.IsDesignMode(this))
+				return;
+			Global.MainWindow.HMan.Tasks.ListChanged -= Tasks_ListChanged;
+			Global.MainWindow.HMan.Tasks.ListChanged += Tasks_ListChanged;
+		}
 	}
 }

@@ -37,7 +37,7 @@ namespace JocysCom.ClassLibrary.Controls
 		object _RightIconOriginalContent;
 		ContentControl _Control;
 		private readonly object TasksLock = new object();
-		private readonly BindingList<T> Tasks = new BindingList<T>();
+		public readonly BindingList<T> Tasks = new BindingList<T>();
 
 		/// <summary>Activate busy spinner.</summary>
 		public void AddTask(T name)

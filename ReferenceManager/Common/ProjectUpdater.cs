@@ -96,12 +96,20 @@ namespace JocysCom.VS.ReferenceManager
 					{
 						// Remove reference.
 						var reference = SolutionHelper.GetReference(project, addedRi.ReferenceName);
-						reference.Remove();
-						// Add Project.
-						var refProject = addedProjects[addedRi];
-						project.References.AddProject(refProject);
+						if (reference != null)
+						{
+							reference.Remove();
+							// Add Project.
+							var refProject = addedProjects[addedRi];
+							project.References.AddProject(refProject);
+						}
 					});
 				}
+				e = new ProjectUpdaterEventArgs
+				{
+					State = ProjectUpdaterStatus.Completed
+				};
+				Report(e);
 				ControlsHelper.Invoke(() =>
 				{
 					Global.MainWindow.HMan.RemoveTask(TaskName.Update);

@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="JocysCom.VS.ReferenceManager" Version="1.2" Language="en-US" Publisher="Jocys.com" />
+        <Identity Id="JocysCom.VS.ReferenceManager" Version="1.3" Language="en-US" Publisher="Jocys.com" />
         <DisplayName>VS Reference Manager</DisplayName>
-        <Description xml:space="preserve">Replace DLL references with project references. Instructions and screenshots:
-https://github.com/JocysCom/VsReferenceManager
-
-2021-0908 Version 1.2.0
-- Fixed crash when adding scan location.
-- Fixed buttons not enabling after replace.
-- Fixed Projects tab taking all space.
+        <Description xml:space="preserve">Replace DLL references with Project references.
 </Description>
         <Icon>App.ico</Icon>
     </Metadata>

@@ -62,6 +62,7 @@ namespace JocysCom.VS.ReferenceManager
 
 		public static VSLangProj.VSProject GetVsProject(string name)
 		{
+			ThreadHelper.ThrowIfNotOnUIThread();
 			var project = GetProject(name);
 			return project?.Object as VSLangProj.VSProject;
 		}

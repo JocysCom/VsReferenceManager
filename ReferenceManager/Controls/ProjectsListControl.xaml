@@ -7,6 +7,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	d:DesignHeight="270"
 	d:DesignWidth="480"
+	Loaded="UserControl_Loaded"
 	mc:Ignorable="d">
 	<UserControl.Resources>
 		<ResourceDictionary>
@@ -47,10 +48,7 @@
 					<RowDefinition Height="*" />
 					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
-				<ToolBarPanel
-					Grid.Row="0"
-					HorizontalAlignment="Right"
-					Style="{StaticResource MainToolBarPanel}">
+				<ToolBarPanel Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource MainToolBarPanel}">
 					<ToolBar Style="{StaticResource MainToolBar}">
 						<Button
 							Name="ScanButton"
@@ -70,14 +68,13 @@
 							Style="{StaticResource ToolBarButton}">
 							<StackPanel Style="{StaticResource ButtonStackPanel}">
 								<ContentControl Content="{StaticResource Icon_objects_exchange}" Style="{StaticResource ButtonContentControl}" />
-								<Label Content="Update References to Projects" Style="{StaticResource ButtonLabel}" />
+								<Label x:Name="UpdateButtonLabel" Content="Update References to Projects" Style="{StaticResource ButtonLabel}" />
 							</StackPanel>
 						</Button>
 						<Button
 							Name="RefreshButton"
 							HorizontalAlignment="Right"
 							x:FieldModifier="public"
-							Click="RefreshButton_Click"
 							Style="{StaticResource ToolBarButton}">
 							<StackPanel Style="{StaticResource ButtonStackPanel}">
 								<ContentControl Content="{StaticResource Icon_Refresh}" Style="{StaticResource ButtonContentControl}" />
@@ -117,10 +114,7 @@
 						<converters:ItemFormattingConverter x:Key="_MainDataGridFormattingConverter" />
 					</DataGrid.Resources>
 					<DataGrid.Columns>
-						<DataGridCheckBoxColumn
-							Binding="{Binding IsEnabled}"
-							EditingElementStyle="{StaticResource CheckBoxCell}"
-							ElementStyle="{StaticResource CheckBoxCell}" />
+						<DataGridCheckBoxColumn Binding="{Binding IsEnabled}" EditingElementStyle="{StaticResource CheckBoxCell}" ElementStyle="{StaticResource CheckBoxCell}" />
 						<DataGridTemplateColumn
 							x:Name="StatusCodeColumn"
 							Width="SizeToCells"

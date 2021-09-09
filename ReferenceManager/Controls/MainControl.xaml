@@ -24,32 +24,36 @@
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
-			<RowDefinition Height="30*" MinHeight="200" />
-			<RowDefinition Height="100*" />
+			<RowDefinition Height="40*" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="60*" />
 		</Grid.RowDefinitions>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="Auto" />
-			<ColumnDefinition Width="*" />
-			<ColumnDefinition Width="Auto" />
-		</Grid.ColumnDefinitions>
-		<controls:ProjectsListControl
-			x:Name="SolutionListPanel"
-			Grid.Row="0"
-			Grid.Column="0"
-			Grid.ColumnSpan="3"
-			ProjectsControlType="Solution" />
-		<controls:ProjectsListControl
-			x:Name="ProjectListPanel"
-			Grid.Row="1"
-			Grid.Column="0"
-			Grid.ColumnSpan="3"
-			ProjectsControlType="Projects" />
-		<controls:ProjectsListControl
-			x:Name="ReferenceListPanel"
+		<controls:ProjectsListControl x:Name="SolutionListPanel" Grid.Row="0" ProjectsControlType="Solution" />
+		<controls:ProjectsListControl x:Name="ProjectListPanel" Grid.Row="1" ProjectsControlType="Projects" />
+		<GridSplitter
 			Grid.Row="2"
-			Grid.Column="0"
-			Grid.ColumnSpan="3"
-			ProjectsControlType="References" />
-
+			Margin="0,0,0,0"
+			Padding="0,0,0,0"
+			HorizontalAlignment="Stretch"
+			VerticalAlignment="Stretch"
+			Background="Gray"
+			ResizeBehavior="PreviousAndNext">
+			<GridSplitter.Template>
+				<ControlTemplate TargetType="{x:Type GridSplitter}">
+					<Grid>
+						<TextBlock
+							Margin="0,0,0,0"
+							Padding="0,0,0,0"
+							HorizontalAlignment="Center"
+							VerticalAlignment="Center"
+							FontSize="8"
+							Foreground="LightGray"
+							Text="●●●●●" />
+						<Rectangle Fill="#00FFFFFF" />
+					</Grid>
+				</ControlTemplate>
+			</GridSplitter.Template>
+		</GridSplitter>
+		<controls:ProjectsListControl x:Name="ReferenceListPanel" Grid.Row="3" ProjectsControlType="References" />
 	</Grid>
 </UserControl>
