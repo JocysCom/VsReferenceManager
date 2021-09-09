@@ -1,6 +1,8 @@
 ﻿using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace JocysCom.VS.ReferenceManager
 {
@@ -51,13 +53,48 @@ namespace JocysCom.VS.ReferenceManager
 		public static Project GetProject(string name)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
+			var projects = GetAllProjects();
+			var project = projects.FirstOrDefault(x => x.Name == name);
+			return project;
+		}
+
+		public static IList<Project> GetAllProjects()
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+			var list = new List<Project>();
 			var solution = GetCurrentSolution();
 			if (solution == null)
-				return null;
-			foreach (Project project in solution.Projects)
-				if (project.Name == name)
-					return project;
-			return null;
+				return list;
+			var projects = solution.Projects;
+			var item = projects.GetEnumerator();
+			while (item.MoveNext())
+			{
+				var project = item.Current as Project;
+				if (project == null)
+					continue;
+				if (project.Kind == ProjectKinds.vsProjectKindSolutionFolder)
+					list.AddRange(GetSolutionFolderProjects(project));
+				else
+					list.Add(project);
+			}
+			return list;
+		}
+
+		private static IEnumerable<Project> GetSolutionFolderProjects(Project solutionFolder)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+			var list = new List<Project>();
+			for (var i = 1; i <= solutionFolder.ProjectItems.Count; i++)
+			{
+				var subProject = solutionFolder.ProjectItems.Item(i).SubProject;
+				if (subProject == null)
+					continue;
+				if (subProject.Kind == ProjectKinds.vsProjectKindSolutionFolder)
+					list.AddRange(GetSolutionFolderProjects(subProject));
+				else
+					list.Add(subProject);
+			}
+			return list;
 		}
 
 		public static VSLangProj.VSProject GetVsProject(string name)
@@ -88,17 +125,6 @@ namespace JocysCom.VS.ReferenceManager
 			folder = (SolutionFolder)project.Object;
 			return folder;
 		}
-
-		//public static Project AddProject(string path)
-		//{
-		//	string prjPath = @"C:\Projects\ClassLibrary1\ClassLibrary1\ClassLibrary1.csproj";
-		//	// Add a project to the new solution folder.  
-		//	SF.AddFromFile(prjPath);
-
-		//}
-
-
-
 
 	}
 }

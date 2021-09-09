@@ -79,14 +79,19 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					break;
 				case ProjectsControlType.Projects:
 					s += "Projects";
+					updatable = list.Count(x => x.StatusCode == MessageBoxImage.Information);
+					var containsCheckedP = list.Any(x => x.IsChecked);
+					var actionP = containsCheckedP ? "Checked" : "Selected";
+					var bnP = $"Update references of {actionP} Projects";
+					ControlsHelper.SetText(UpdateButtonLabel, bnP);
 					break;
 				case ProjectsControlType.References:
 					s += "References";
 					updatable = list.Count(x => x.StatusCode == MessageBoxImage.Information);
-					var containsChecked = list.Any(x => x.IsChecked);
-					var action = containsChecked ? "Checked" : "Selected";
-					var bn = $"Update {action} References To Projects";
-					ControlsHelper.SetText(UpdateButtonLabel, bn);
+					var containsCheckedR = list.Any(x => x.IsChecked);
+					var action = containsCheckedR ? "Checked" : "Selected";
+					var bnR = $"Update {action} References To Projects";
+					ControlsHelper.SetText(UpdateButtonLabel, bnR);
 					break;
 				case ProjectsControlType.ScanResults:
 					s += "Scan Results";

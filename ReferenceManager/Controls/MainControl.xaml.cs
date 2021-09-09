@@ -99,20 +99,20 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			ProjectList.Clear();
 			if (solution == null)
 				return;
-			for (int i = 0; i < solution.Projects.Count; i++)
+			var projects = SolutionHelper.GetAllProjects();
+			for (int i = 0; i < projects.Count; i++)
 			{
 				// Try cast item to project (could be solution item).
-				var p = solution.Projects.Item(i + 1).Object as VSLangProj.VSProject;
-				if (p != null)
+				var p = projects[i].Object as VSLangProj.VSProject;
+				if (p == null)
+					continue;
+				var item = new ReferenceItem()
 				{
-					var item = new ReferenceItem()
-					{
-						ProjectName = p.Project.Name,
-						ProjectPath = p.Project.FullName,
-						Tag = p,
-					};
-					ProjectList.Add(item);
-				}
+					ProjectName = p.Project.Name,
+					ProjectPath = p.Project.FullName,
+					Tag = p,
+				};
+				ProjectList.Add(item);
 			}
 		}
 
@@ -278,22 +278,13 @@ namespace JocysCom.VS.ReferenceManager.Controls
 
 		List<ReferenceItem> GetCheckedOrSelectedReferences(ProjectsListControl control, out bool containsChecked)
 		{
-			List<ReferenceItem> references; 
 			var list = control.ReferenceList;
 			containsChecked = list.Any(x => x.IsChecked);
-			// If some records are checked then...
-			if (containsChecked)
-			{
-				// Select CHECKED records.
-			   references = list.Where(x => x.StatusCode == MessageBoxImage.Information).ToList();
-			}
-			else
-			{
-				// Select SELECTED records.
-				references = control.MainDataGrid
-				.SelectedItems.Cast<ReferenceItem>().ToList()
-				.Where(x => x.StatusCode == MessageBoxImage.Information).ToList();
-			}
+			var references = containsChecked
+				? list.Where(x => x.IsChecked).ToList()
+				: control.MainDataGrid.SelectedItems.Cast<ReferenceItem>().ToList();
+			if (control.ProjectsControlType == ProjectsControlType.References)
+				references = references.Where(x => x.StatusCode == MessageBoxImage.Information).ToList();
 			return references;
 		}
 
