@@ -268,7 +268,19 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				form.ShowDialog($"There are no project references to update.", "Update", MessageBoxButton.OK, MessageBoxImage.Information);
 				return;
 			}
-			var result = form.ShowDialog($"Update {referenceText} on {projectText}?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+			var message = $"Update {referenceText} on {projectText}?";
+			if (referenceCount < 8)
+			{
+				message = "";
+				foreach (var project in param.Data.Keys)
+				{
+					message += $"\r\nProject \"{project.Project?.Name}\" references:\r\n\r\n";
+					foreach (var reference in param.Data[project])
+						message += $"\t{reference.ReferenceName}\r\n";
+				}
+				message = message.Trim('\r', '\n');
+			}
+			var result = form.ShowDialog(message, "Update References", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 			if (result != MessageBoxResult.OK)
 				return;
 			// Set progress controls.

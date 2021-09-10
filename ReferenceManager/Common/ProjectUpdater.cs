@@ -65,8 +65,8 @@ namespace JocysCom.VS.ReferenceManager
 					if (string.IsNullOrEmpty(ri.ProjectPath))
 						continue;
 					// If reference path not available then skip.
-					//if (string.IsNullOrEmpty(ri.ReferencePath))
-					//	continue;
+					if (string.IsNullOrEmpty(ri.ReferencePath))
+						continue;
 					VSLangProj.VSProject vsProject = null;
 					ControlsHelper.Invoke(() =>
 					{
