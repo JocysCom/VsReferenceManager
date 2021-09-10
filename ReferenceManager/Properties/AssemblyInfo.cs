@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Jocys.com VS Reference Manager")]
-[assembly: AssemblyDescription("Update DLL references with project references.")]
+[assembly: AssemblyDescription("Scan and update DLL references with Project references.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Jocys.com")]
 [assembly: AssemblyProduct("VS Reference Manager")]
