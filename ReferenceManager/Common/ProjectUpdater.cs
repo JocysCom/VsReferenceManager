@@ -68,21 +68,21 @@ namespace JocysCom.VS.ReferenceManager
 					// If reference path not available then skip.
 					if (string.IsNullOrEmpty(ri.ReferencePath))
 						continue;
-
 					VSLangProj.VSProject vsProject = null;
 					ControlsHelper.Invoke(() =>
 					{
 						vsProject = SolutionHelper.GetVsProject(ri.ProjectName);
 					});
-					// if Project was found inside current solution then...
-					if (vsProject != null)
-						continue;
-					Project refProject = null;
-					ControlsHelper.Invoke(() =>
+					// If Project was not found inside current solution then...
+					var refProject = vsProject?.Project;
+					if (refProject == null)
 					{
-						// Add project to solution.
-						refProject = folder.AddFromFile(ri.ProjectPath);
-					});
+						ControlsHelper.Invoke(() =>
+						{
+							// Add project to solution.
+							refProject = folder.AddFromFile(ri.ProjectPath);
+						});
+					}
 					addedProjects.Add(ri, refProject);
 				}
 				// Step 3: Remove References add projects.
@@ -109,16 +109,16 @@ namespace JocysCom.VS.ReferenceManager
 						}
 					});
 				}
-				e = new ProjectUpdaterEventArgs
-				{
-					State = ProjectUpdaterStatus.Completed
-				};
-				Report(e);
-				ControlsHelper.Invoke(() =>
-				{
-					Global.MainWindow.HMan.RemoveTask(TaskName.Update);
-				});
 			}
+			e = new ProjectUpdaterEventArgs
+			{
+				State = ProjectUpdaterStatus.Completed
+			};
+			Report(e);
+			ControlsHelper.Invoke(() =>
+			{
+				Global.MainWindow.HMan.RemoveTask(TaskName.Update);
+			});
 		}
 
 	}
