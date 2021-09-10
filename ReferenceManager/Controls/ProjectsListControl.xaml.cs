@@ -8,7 +8,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -184,7 +183,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 						if (ReferenceList.Count > 0)
 							MainDataGrid.SelectedIndex = 0;
 					}
-					ShowColumns(ProjectNameColumn, ProjectAssemblyNameColumn, ReferenceNameColumn, ReferencePathColumn);
+					ShowColumns(ProjectNameColumn, ProjectAssemblyNameColumn, ProjectFrameworkVersionColumn, ReferenceNameColumn, ReferencePathColumn);
 					ShowButtons(ScanButton, ExportButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_clipboard_checks];
 					break;
@@ -275,7 +274,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			_Scanner.Scan(paths, currentInfo, name);
 		}
 
-		private void _Scanner_Progress(object sender, ProjectScannerEventArgs e)
+		private void _Scanner_Progress(object sender, ProjectUpdaterEventArgs e)
 		{
 			if (ControlsHelper.InvokeRequired)
 			{
@@ -285,54 +284,22 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				return;
 			}
 			var scanner = (ProjectScanner)sender;
-			var label = e.Level == 0
-				? ProgressLevelTopLabel
-				: ProgressLevelSubLabel;
 			switch (e.State)
 			{
-				case ProjectScannerStatus.Started:
-					label.Text = "Scanning...";
+				case ProjectUpdaterStatus.Started:
+					UpdateProgress("Started...", "");
 					break;
-				case ProjectScannerStatus.DataFound:
-				case ProjectScannerStatus.DataUpdated:
+				case ProjectUpdaterStatus.Updated:
 					lock (AddAndUpdateLock)
 					{
-						var data = e.Data;
-						foreach (var r in data)
-							ReferenceList.Add(r);
+						if (e.SubData is List<ReferenceItem> ris)
+						foreach (var ri in ris)
+							ReferenceList.Add(ri);
 					}
+					UpdateProgress(e);
 					break;
-				case ProjectScannerStatus.DirectoryUpdate:
-				case ProjectScannerStatus.FileUpdate:
-					var sb = new StringBuilder();
-					sb.AppendLine(e.Message);
-					if (e.State == ProjectScannerStatus.DirectoryUpdate && e.Directories != null)
-					{
-						sb.AppendFormat("Current Folder: {0}", e.Directories[e.DirectoryIndex].FullName);
-					}
-					if (e.State == ProjectScannerStatus.FileUpdate && e.Files != null)
-					{
-						var file = e.Files[e.FileIndex];
-						var size = file.Length / 1024 / 1024;
-						sb.AppendFormat("Current File ({0:0.0} MB): {1} ", size, file.FullName);
-					}
-					if (e.Level == 0)
-					{
-						sb.AppendLine();
-						sb.AppendFormat("Skipped = {0}, Added = {1}, Updated = {2}", e.Skipped, e.Added, e.Updated);
-					}
-					sb.AppendLine();
-					ControlsHelper.Invoke(() =>
-					{
-						label.Text = sb.ToString();
-					});
-					break;
-				case ProjectScannerStatus.Completed:
-					ControlsHelper.Invoke(() =>
-					{
-						ScanButton.IsEnabled = true;
-						ScanProgressPanel.Visibility = Visibility.Collapsed;
-					});
+				case ProjectUpdaterStatus.Completed:
+					UpdateProgress();
 					ProjectScanner.CashedData.Save();
 					Global.ReferenceItems.Save();
 					ScanButton.IsEnabled = true;
@@ -409,6 +376,65 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				return;
 			Global.MainWindow.HMan.Tasks.ListChanged -= Tasks_ListChanged;
 			Global.MainWindow.HMan.Tasks.ListChanged += Tasks_ListChanged;
+		}
+
+		public void UpdateProgress(ProjectUpdaterEventArgs e)
+		{
+			if (e.TopCount > 0)
+			{
+				if (ProgressLevelTopBar.Maximum != e.TopCount)
+					ProgressLevelTopBar.Maximum = e.TopCount;
+				if (ProgressLevelTopBar.Value != e.TopIndex)
+					ProgressLevelTopBar.Value = e.TopIndex;
+
+			}
+			else
+			{
+				if (ProgressLevelTopBar.Maximum != 100)
+					ProgressLevelTopBar.Maximum = 100;
+				if (ProgressLevelTopBar.Value != 0)
+					ProgressLevelTopBar.Value = 0;
+
+			}
+			if (e.SubCount > 0)
+			{
+				if (ProgressLevelSubBar.Maximum != e.SubCount)
+					ProgressLevelSubBar.Maximum = e.SubCount;
+				if (ProgressLevelSubBar.Value != e.SubIndex)
+					ProgressLevelSubBar.Value = e.SubIndex;
+			}
+			else
+			{
+				if (ProgressLevelSubBar.Maximum != 100)
+					ProgressLevelSubBar.Maximum = 100;
+				if (ProgressLevelSubBar.Value != 0)
+					ProgressLevelSubBar.Value = 0;
+			}
+			// Create top message.
+			var tm = "";
+			if (e.TopCount > 0)
+				tm += $"{e.TopIndex}/{e.TopCount} - ";
+			tm += $"{e.TopMessage}";
+			// Create sub message.
+			var sm = "";
+			if (e.SubCount > 0)
+				sm += $"{e.SubIndex}/{e.SubCount} - ";
+			sm += $"{e.SubMessage}";
+			UpdateProgress(tm, sm);
+		}
+
+		public void UpdateProgress(string topText = "", string SubText = "", bool? resetBars = null)
+		{
+			ControlsHelper.SetText(ProgressLevelTopLabel, topText);
+			ControlsHelper.SetText(ProgressLevelSubLabel, SubText);
+			if (resetBars.GetValueOrDefault())
+			{
+				ProgressLevelTopBar.Maximum = 100;
+				ProgressLevelTopBar.Value = 0;
+				ProgressLevelSubBar.Maximum = 100;
+				ProgressLevelSubBar.Value = 0;
+			}
+			ControlsHelper.SetVisible(ScanProgressPanel, !string.IsNullOrEmpty(topText));
 		}
 	}
 }

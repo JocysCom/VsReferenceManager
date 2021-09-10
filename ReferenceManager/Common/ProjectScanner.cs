@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace JocysCom.VS.ReferenceManager
 {
-	public class ProjectScanner : IProgress<ProjectScannerEventArgs>
+	public class ProjectScanner : IProgress<ProjectUpdaterEventArgs>
 	{
 
 		public ProjectScanner()
@@ -19,9 +19,9 @@ namespace JocysCom.VS.ReferenceManager
 
 		#region ■ IProgress
 
-		public event EventHandler<ProjectScannerEventArgs> Progress;
+		public event EventHandler<ProjectUpdaterEventArgs> Progress;
 
-		public void Report(ProjectScannerEventArgs e)
+		public void Report(ProjectUpdaterEventArgs e)
 			=> Progress?.Invoke(this, e);
 
 		#endregion
@@ -81,9 +81,9 @@ namespace JocysCom.VS.ReferenceManager
 			IsStopping = false;
 			IsPaused = false;
 			// Step 1: Get list of files inside the folder.
-			var e = new ProjectScannerEventArgs
+			var e = new ProjectUpdaterEventArgs
 			{
-				State = ProjectScannerStatus.Started
+				State = ProjectUpdaterStatus.Started
 			};
 			Report(e);
 			var skipped = 0;
@@ -106,57 +106,60 @@ namespace JocysCom.VS.ReferenceManager
 			{
 				var file = files[i];
 				// If file doesn't exist in the game list then continue.
-				e = new ProjectScannerEventArgs
+				e = new ProjectUpdaterEventArgs
 				{
-					Message = string.Format("Step 2: Scan file {0} of {1}. Please wait...", i + 1, files.Count),
-					FileIndex = i,
-					Files = files,
-					State = ProjectScannerStatus.FileUpdate,
-					Added = added,
-					Skipped = skipped,
-					Updated = updated
+					TopMessage = $"Scan Files. Added = {added}, Skipped = {skipped}, Updated = {updated}",
+					TopIndex = i,
+					TopCount = files.Count,
+					TopData = files,
+					SubIndex = 0,
+					SubCount = 0,
 				};
+				var size = file.Length / 1024;
+				var name = file.FullName;
+				e.SubMessage = $"Current File: {name}";
 				Report(e);
-				e = new ProjectScannerEventArgs
-				{
-					FileInfo = file
-				};
 				// Get info by full name.
 				var info = currentInfo.FirstOrDefault(x => x.FullName.ToLower() == fileName);
 				var data = FromDisk(file.FullName);
-				e.Data = data;
+				e.SubData = data;
 				// If file doesn't exist current list then...
 				if (info == null)
 				{
-					e.State = ProjectScannerStatus.DataFound;
+					e.State = ProjectUpdaterStatus.Updated;
 					added++;
 				}
 				else
 				{
-					e.State = ProjectScannerStatus.DataUpdated;
+					e.State = ProjectUpdaterStatus.Updated;
 					updated++;
 				}
 				Report(e);
 			}
 			_DateEnded = DateTime.Now;
-			e = new ProjectScannerEventArgs
+			e = new ProjectUpdaterEventArgs
 			{
-				State = ProjectScannerStatus.Completed
+				State = ProjectUpdaterStatus.Completed
 			};
 			Report(e);
 		}
 
 		private void ff_FileFound(object sender, FileFinderEventArgs e)
 		{
-			var e2 = new ProjectScannerEventArgs
+			var e2 = new ProjectUpdaterEventArgs
 			{
-				DirectoryIndex = e.DirectoryIndex,
-				Directories = e.Directories,
-				FileIndex = e.FileIndex,
-				Files = e.Files,
-				State = ProjectScannerStatus.DirectoryUpdate,
-				Message = string.Format("Step 1: {0} files found. Searching path {1} of {2}. Please wait...", e.Files.Count, e.DirectoryIndex + 1, e.Directories.Count)
+				TopIndex = e.DirectoryIndex,
+				TopCount = e.Directories.Count,
+				TopData = e.Directories,
+				SubIndex = e.FileIndex,
+				SubCount = 0,
+				SubData = e.Files,
+				State = ProjectUpdaterStatus.Updated,
 			};
+			e2.TopMessage = $"Scan Folder: {e.Directories[e.DirectoryIndex].FullName}";
+			var file = e.Files[e.FileIndex];
+			var name = file.FullName;
+			e2.SubMessage = $"File: {name}";
 			Report(e2);
 		}
 
@@ -175,9 +178,9 @@ namespace JocysCom.VS.ReferenceManager
 			var projectReferenceNodes = projectNode.Descendants(ns + "ItemGroup").Descendants(ns + "ProjectReference").ToArray();
 			var projectName = System.IO.Path.GetFileNameWithoutExtension(fileName);
 			var assemblyNodes = projectNode.Descendants(ns + "PropertyGroup").Descendants(ns + "AssemblyName").ToArray();
-			var assemblyName = assemblyNodes.Count() > 0
-					? assemblyNodes[0].Value
-					: projectName;
+			var assemblyName = assemblyNodes.FirstOrDefault()?.Value ?? projectName;
+			var versionNodes = projectNode.Descendants(ns + "PropertyGroup").Descendants(ns + "TargetFrameworkVersion").ToArray();
+			var versionValue = versionNodes.FirstOrDefault()?.Value;
 			var fi = new FileInfo(fileName);
 			var getNewItem = new Func<string, string, string, ReferenceItem>((name, path, project) =>
 				{
@@ -186,6 +189,7 @@ namespace JocysCom.VS.ReferenceManager
 					item.ProjectPath = fileName;
 					item.ProjectName = projectName;
 					item.ProjectAssemblyName = assemblyName;
+					item.ProjectFrameworkVersion = versionValue;
 					// Fill reference part.
 					var fullPath = "";
 					if (!string.IsNullOrEmpty(path))

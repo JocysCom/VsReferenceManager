@@ -46,7 +46,7 @@ namespace JocysCom.VS.ReferenceManager
 					e.State = ProjectUpdaterStatus.Updated;
 					e.TopIndex = p;
 					e.TopCount = projects.Count;
-					e.TopItem = project;
+					e.TopData = project;
 					e.TopMessage = $"Project: {project.Project.Name}";
 					e.ClearSub();
 					Report(e);
@@ -58,41 +58,43 @@ namespace JocysCom.VS.ReferenceManager
 					var ri = references[r];
 					e.SubIndex = r;
 					e.SubCount = references.Count;
-					e.SubItem = ri;
+					e.SubData = ri;
 					e.SubMessage = $"Adding Reference Project to Solution: {ri.ProjectName}";
 					Report(e);
 					// If project name not available then skip.
 					if (string.IsNullOrEmpty(ri.ProjectPath))
 						continue;
 					// If reference path not available then skip.
-					if (string.IsNullOrEmpty(ri.ReferencePath))
-						continue;
+					//if (string.IsNullOrEmpty(ri.ReferencePath))
+					//	continue;
 					VSLangProj.VSProject vsProject = null;
 					ControlsHelper.Invoke(() =>
 					{
 						vsProject = SolutionHelper.GetVsProject(ri.ProjectName);
 					});
 					// If Project was not found inside current solution then...
-					var refProject = vsProject?.Project;
-					if (refProject == null)
+					var referenceProject = vsProject?.Project;
+					if (referenceProject == null)
 					{
 						ControlsHelper.Invoke(() =>
 						{
 							// Add project to solution.
-							refProject = folder.AddFromFile(ri.ProjectPath);
+							referenceProject = folder.AddFromFile(ri.ProjectPath);
 						});
 					}
 					e.SubMessage = $"Updating Reference: {ri.ReferenceName}";
 					Report(e);
 					ControlsHelper.Invoke(() =>
 					{
+						
+
 						// Remove reference.
 						var reference = SolutionHelper.GetReference(project, ri.ReferenceName);
 						if (reference != null)
 						{
 							reference.Remove();
 							// Add Project.
-							project.References.AddProject(refProject);
+							project.References.AddProject(referenceProject);
 						}
 					});
 				}

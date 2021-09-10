@@ -4,7 +4,9 @@
 	{
 		None = 0,
 		Started,
+		Created,
 		Updated,
+		Deleted,
 		Completed,
 	}
 }

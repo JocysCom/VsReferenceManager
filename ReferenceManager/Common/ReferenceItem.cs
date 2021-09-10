@@ -40,6 +40,9 @@ namespace JocysCom.VS.ReferenceManager
 		public System.Windows.MessageBoxImage StatusCode { get => _StatusCode; set => SetProperty(ref _StatusCode, value); }
 		System.Windows.MessageBoxImage _StatusCode;
 
+		public string ProjectFrameworkVersion { get => _ProjectFrameworkVersion; set => SetProperty(ref _ProjectFrameworkVersion, value); }
+		string _ProjectFrameworkVersion;
+
 		public bool IsChecked
 		{
 			get => _IsChecked;

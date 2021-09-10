@@ -195,6 +195,12 @@
 							ElementStyle="{StaticResource TextBlockCell}"
 							Header="Project Assembly Name" />
 						<DataGridTextColumn
+							x:Name="ProjectFrameworkVersionColumn"
+							Binding="{Binding ProjectFrameworkVersion}"
+							EditingElementStyle="{StaticResource TextBoxCell}"
+							ElementStyle="{StaticResource TextBlockCell}"
+							Header="Version" />
+						<DataGridTextColumn
 							x:Name="ProjectPathColumn"
 							Width="*"
 							Binding="{Binding ProjectPath}"

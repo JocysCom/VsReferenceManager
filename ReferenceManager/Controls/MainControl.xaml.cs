@@ -1,6 +1,7 @@
 ﻿using JocysCom.ClassLibrary.ComponentModel;
 using JocysCom.ClassLibrary.Controls;
 using Microsoft.VisualStudio.Shell;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -128,7 +129,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			var selection = ControlsHelper.GetSelection<string>(grid, key);
 			var selectedProject = (ReferenceItem)ProjectListPanel.MainDataGrid.SelectedItem;
 			FillReferencesFromSelectedProject(selectedProject, ReferenceList);
-			UpdateReferences_FindProjects(ReferenceList);
+			UpdateReferences_FindProjects(selectedProject, ReferenceList);
 			ControlsHelper.RestoreSelection(grid, key, selection);
 		}
 
@@ -165,33 +166,49 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			}
 		}
 
-		void UpdateReferences_FindProjects(IList<ReferenceItem> references)
+		void UpdateReferences_FindProjects(ReferenceItem project, IList<ReferenceItem> references)
 		{
 			for (int r = 0; r < references.Count; r++)
 			{
 				var ri = references[r];
 				// Find project for reference.
 				var refProjects = Global.ReferenceItems.Items.Where(x => x.ProjectAssemblyName == ri.ReferenceName && x.IsProject).ToList();
-				if (refProjects.Count() == 1)
-				{
-					ControlsHelper.Invoke(() =>
-					{
-						var refProject = refProjects[0];
-						ri.ProjectName = refProject.ProjectName;
-						ri.ProjectPath = refProject.ProjectPath;
-						ri.ProjectAssemblyName = refProject.ProjectAssemblyName;
-						ri.StatusCode = MessageBoxImage.Information;
-						ri.StatusText = "Project Found";
-					});
-				}
-				else if (refProjects.Count() > 1)
+				// Continue if no projects found.
+				if (refProjects.Count == 0)
+					continue;
+				// If more than 1 project found then...
+				if (refProjects.Count() > 1)
 				{
 					ControlsHelper.Invoke(() =>
 					{
 						ri.StatusCode = MessageBoxImage.Warning;
 						ri.StatusText = "Multiple Projects found";
+
 					});
+					continue;
 				}
+				// Get reference.
+				var refProject = refProjects.First();
+				Version refVersion;
+				Version projectVersion;
+				if (Version.TryParse(project.ProjectFrameworkVersion, out projectVersion) &&
+					Version.TryParse(refProject.ProjectFrameworkVersion, out refVersion) && refVersion > projectVersion)
+				{
+					ControlsHelper.Invoke(() =>
+					{
+						ri.StatusCode = MessageBoxImage.Warning;
+						ri.StatusText = "High Reference Version";
+					});
+					continue;
+				}
+				ControlsHelper.Invoke(() =>
+				{
+					ri.ProjectName = refProject.ProjectName;
+					ri.ProjectPath = refProject.ProjectPath;
+					ri.ProjectAssemblyName = refProject.ProjectAssemblyName;
+					ri.StatusCode = MessageBoxImage.Information;
+					ri.StatusText = "Project Found";
+				});
 			}
 		}
 
@@ -246,7 +263,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					// Fill list with reference projects.
 					FillReferencesFromSelectedProject(projectItem, references);
 					// Mark records which can be updated.
-					UpdateReferences_FindProjects(references);
+					UpdateReferences_FindProjects(projectItem, references);
 					// Leave only updatable records i.e. records which have "Information" status code.
 					references = references.Where(x => x.StatusCode == MessageBoxImage.Information).ToList();
 				}
@@ -284,19 +301,13 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			if (result != MessageBoxResult.OK)
 				return;
 			// Set progress controls.
-			_TaskPanel = control.ScanProgressPanel;
-			_TaskTopLabel = control.ProgressLevelTopLabel;
-			_TaskSubLabel = control.ProgressLevelSubLabel;
-			_TaskTopBar = control.ProgressLevelTopBar;
-			_TaskSubBar = control.ProgressLevelSubBar;
+			_TaskControl = control;
 			// Begin.
 			Global.MainWindow.HMan.AddTask(TaskName.Update);
 			var success = System.Threading.ThreadPool.QueueUserWorkItem(ProjectUpdateTask, param);
 			if (!success)
 			{
-				_TaskTopLabel.Text = "Scan failed!";
-				_TaskSubLabel.Text = "";
-				_TaskPanel.Visibility = Visibility.Visible;
+				_TaskControl.UpdateProgress("Scan failed!", "", true);
 				Global.MainWindow.HMan.RemoveTask(TaskName.Update);
 			}
 		}
@@ -337,21 +348,15 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			return references;
 		}
 
+		ProjectsListControl _TaskControl;
 		ProjectUpdater _ProjectUpdater;
-		TextBlock _TaskTopLabel;
-		TextBlock _TaskSubLabel;
-		ProgressBar _TaskTopBar;
-		ProgressBar _TaskSubBar;
-		UIElement _TaskPanel;
 
 		void ProjectUpdateTask(object state)
 		{
 			var projects = new List<VSLangProj.VSProject>();
 			ControlsHelper.Invoke(() =>
 			{
-				_TaskTopLabel.Text = "...";
-				_TaskSubLabel.Text = "";
-				_TaskPanel.Visibility = Visibility.Visible;
+				_TaskControl.UpdateProgress("Starting...", "", true);
 			});
 			_ProjectUpdater = new ProjectUpdater();
 			_ProjectUpdater.Progress += _ProjectUpdater_Progress;
@@ -372,33 +377,19 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			switch (e.State)
 			{
 				case ProjectUpdaterStatus.Started:
-					_TaskTopLabel.Text = "Starting...";
+					_TaskControl.UpdateProgress("Started...", "");
 					break;
 				case ProjectUpdaterStatus.Updated:
-					ControlsHelper.Invoke(() =>
-					{
-						_TaskTopLabel.Text = $"{e.TopIndex}/{e.TopCount} - {e.TopMessage}";
-						_TaskTopBar.Value = e.TopIndex;
-						_TaskTopBar.Maximum = e.TopCount;
-						_TaskSubLabel.Text = $"{e.SubIndex}/{e.SubCount} - {e.SubMessage}";
-						_TaskSubBar.Value = e.SubIndex;
-						_TaskSubBar.Maximum = e.SubCount;
-					});
+					_TaskControl.UpdateProgress(e);
 					break;
 				case ProjectUpdaterStatus.Completed:
-					ControlsHelper.Invoke(() =>
-					{
-						_TaskPanel.Visibility = Visibility.Collapsed;
-					});
+					_TaskControl.UpdateProgress();
 					ProjectScanner.CashedData.Save();
 					Global.ReferenceItems.Save();
+					UpdateSolution();
+					UpdateProjects();
+					UpdateReferences();
 					Global.MainWindow.HMan.RemoveTask(TaskName.Update);
-					ControlsHelper.BeginInvoke(() =>
-					{
-						UpdateSolution();
-						UpdateProjects();
-						UpdateReferences();
-					});
 					break;
 				default:
 					break;

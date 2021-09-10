@@ -50,7 +50,6 @@
     <Compile Include="Common\Global.cs" />
     <Compile Include="Common\ProjectFileInfo.cs" />
     <Compile Include="Common\ProjectScanner.cs" />
-    <Compile Include="Common\ProjectScannerEventArgs.cs" />
     <Compile Include="Common\ProjectScannerStatus.cs" />
     <Compile Include="Common\ProjectsControlType.cs" />
     <Compile Include="Common\ProjectUpdater.cs" />
