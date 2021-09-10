@@ -4,7 +4,7 @@ Scan and update DLL references with Project references. Works with C# and VB.NET
 
 ## Why extension was created?
 
-A long time ago CPUs and hard drivers were much slower. Developers used to split projects into multiple solutions and used DLL references in order for Visual Studio to work faster.  Today CPUs have more cores and blazing fast solid state drives (SSDs). Developers can load hundreds of projects into one Visual Studio solution, which also is much better for refactoring and debugging. This extension can scan your disk, find original projects of DLLs, add them to Solution and replace DLLs references with original Project references.
+A long time ago CPUs and hard drivers were much slower. Developers used to split projects into multiple solutions and used DLL references in order for Visual Studio to work faster. Today we have CPUs with more cores and blazing fast solid state drives (SSDs). Developers can load hundreds of projects into one Visual Studio solution, which also is much better for refactoring and debugging. This extension can scan your disk, find original projects of DLLs, add them to Solution and replace DLLs references with original Project references.
 
 ## How it works
 
