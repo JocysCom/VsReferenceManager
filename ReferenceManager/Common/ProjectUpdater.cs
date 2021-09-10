@@ -51,7 +51,6 @@ namespace JocysCom.VS.ReferenceManager
 					e.ClearSub();
 					Report(e);
 				});
-				var addedProjects = new Dictionary<ReferenceItem, Project>();
 				var references = param.Data[project];
 				// Step 2: Add projects to solution.
 				for (int r = 0; r < references.Count; r++)
@@ -60,14 +59,14 @@ namespace JocysCom.VS.ReferenceManager
 					e.SubIndex = r;
 					e.SubCount = references.Count;
 					e.SubItem = ri;
-					e.SubMessage = $"Step 2: Adding Project to Solution: {ri.ProjectName}";
+					e.SubMessage = $"Adding Reference Project to Solution: {ri.ProjectName}";
 					Report(e);
 					// If project name not available then skip.
 					if (string.IsNullOrEmpty(ri.ProjectPath))
 						continue;
 					// If reference path not available then skip.
-					if (string.IsNullOrEmpty(ri.ReferencePath))
-						continue;
+					//if (string.IsNullOrEmpty(ri.ReferencePath))
+					//	continue;
 					VSLangProj.VSProject vsProject = null;
 					ControlsHelper.Invoke(() =>
 					{
@@ -83,28 +82,16 @@ namespace JocysCom.VS.ReferenceManager
 							refProject = folder.AddFromFile(ri.ProjectPath);
 						});
 					}
-					addedProjects.Add(ri, refProject);
-				}
-				// Step 3: Remove References add projects.
-				var addedReferences = addedProjects.Keys.ToArray();
-				for (int r = 0; r < addedProjects.Count; r++)
-				{
-					var addedRi = addedReferences[r];
-					var ri = references[r];
-					e.SubIndex = r;
-					e.SubCount = references.Count;
-					e.SubItem = ri;
-					e.SubMessage = $"Step 3: Updating Reference: {ri.ReferenceName}";
+					e.SubMessage = $"Updating Reference: {ri.ReferenceName}";
 					Report(e);
 					ControlsHelper.Invoke(() =>
 					{
 						// Remove reference.
-						var reference = SolutionHelper.GetReference(project, addedRi.ReferenceName);
+						var reference = SolutionHelper.GetReference(project, ri.ReferenceName);
 						if (reference != null)
 						{
 							reference.Remove();
 							// Add Project.
-							var refProject = addedProjects[addedRi];
 							project.References.AddProject(refProject);
 						}
 					});

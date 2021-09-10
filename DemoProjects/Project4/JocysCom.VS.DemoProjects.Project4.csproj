@@ -10,10 +10,10 @@
 
   <ItemGroup>
     <Reference Include="JocysCom.VS.DemoProjects.Project1">
-      <HintPath>..\Project1\bin\Debug\net5.0\JocysCom.VS.DemoProjects.Project1.dll</HintPath>
+      <HintPath>..\Libs\JocysCom.VS.DemoProjects.Project1.dll</HintPath>
     </Reference>
     <Reference Include="JocysCom.VS.DemoProjects.Project2">
-      <HintPath>..\Project2\bin\Debug\net5.0\JocysCom.VS.DemoProjects.Project2.dll</HintPath>
+      <HintPath>..\Libs\JocysCom.VS.DemoProjects.Project2.dll</HintPath>
     </Reference>
   </ItemGroup>
 
