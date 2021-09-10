@@ -18,6 +18,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			InitializeComponent();
 			SolutionListPanel.RefreshButton.Click += SolutionListPanel_RefreshButton_Click;
 			SolutionListPanel.MainDataGrid.SelectionChanged += SolutionListPanel_MainDataGrid_SelectionChanged;
+			SolutionListPanel.UpdateButton.Click += SolutionListPanel_UpdateButton_Click;
 			// Trigger projects update.
 			ProjectListPanel.RefreshButton.Click += ProjectListPanel_RefreshButton_Click;
 			ProjectListPanel.MainDataGrid.SelectionChanged += ProjectListPanel_MainDataGrid_SelectionChanged;
@@ -231,49 +232,85 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			return vsProject;
 		}
 
-		private void ProjectListPanel_UpdateButton_Click(object sender, RoutedEventArgs e)
+		void StartUpdater(ProjectsListControl control, IList<ReferenceItem> projectItems, IList<ReferenceItem> referenceItems = null)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 			var param = new ProjectUpdaterParam();
-			bool containsChecked;
-			var projectItems = GetCheckedOrSelectedReferences(ProjectListPanel, out containsChecked);
-			int referenceCount = 0;
 			foreach (var projectItem in projectItems)
 			{
 				// Create list to gather information about references.
-				var references = new List<ReferenceItem>();
-				// Fill list with reference projects.
-				FillReferencesFromSelectedProject(projectItem, references);
-				// Mark records which can be updated.
-				UpdateReferences_FindProjects(references);
-				// Leave only updatable records i.e. records which have "Information" status code.
-				references = references.Where(x => x.StatusCode == MessageBoxImage.Information).ToList();
-				// Get Visual studio objects.
-				var project = SolutionHelper.GetVsProject(projectItem.ProjectName);
-				param.Data.Add(project, references);
-				referenceCount += references.Count;
+				var references = referenceItems;
+				if (references == null)
+				{
+					references = new List<ReferenceItem>();
+					// Fill list with reference projects.
+					FillReferencesFromSelectedProject(projectItem, references);
+					// Mark records which can be updated.
+					UpdateReferences_FindProjects(references);
+					// Leave only updatable records i.e. records which have "Information" status code.
+					references = references.Where(x => x.StatusCode == MessageBoxImage.Information).ToList();
+				}
+				// If found references to update then...
+				if (references.Count > 0)
+				{
+					// Get Visual studio objects.
+					var project = SolutionHelper.GetVsProject(projectItem.ProjectName);
+					param.Data.Add(project, references);
+				}
 			};
 			var form = new MessageBoxWindow();
-			var result = form.ShowDialog($"Replace {referenceCount} references on {param.Data.Keys.Count} projects?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+			var projectCount = param.Data.Keys.Count;
+			var referenceCount = param.Data.Values.Select(x => x.Count).Sum();
+			var referenceText = $"{referenceCount} reference" + (referenceCount > 1 ? "s" : "");
+			var projectText = $"{projectCount} project" + (projectCount > 1 ? "s" : "");
+			if (projectCount == 0)
+			{
+				form.ShowDialog($"There are no project references to update.", "Update", MessageBoxButton.OK, MessageBoxImage.Information);
+				return;
+			}
+			var result = form.ShowDialog($"Update {referenceText} on {projectText}?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 			if (result != MessageBoxResult.OK)
 				return;
-			StartUpdate(param);
+			// Set progress controls.
+			_TaskPanel = control.ScanProgressPanel;
+			_TaskTopLabel = control.ProgressLevelTopLabel;
+			_TaskSubLabel = control.ProgressLevelSubLabel;
+			_TaskTopBar = control.ProgressLevelTopBar;
+			_TaskSubBar = control.ProgressLevelSubBar;
+			// Begin.
+			Global.MainWindow.HMan.AddTask(TaskName.Update);
+			var success = System.Threading.ThreadPool.QueueUserWorkItem(ProjectUpdateTask, param);
+			if (!success)
+			{
+				_TaskTopLabel.Text = "Scan failed!";
+				_TaskSubLabel.Text = "";
+				_TaskPanel.Visibility = Visibility.Visible;
+				Global.MainWindow.HMan.RemoveTask(TaskName.Update);
+			}
+		}
+
+		private void SolutionListPanel_UpdateButton_Click(object sender, RoutedEventArgs e)
+		{
+			var projectItems = ProjectListPanel.ReferenceList.ToList();
+			StartUpdater(SolutionListPanel, projectItems);
+		}
+
+		private void ProjectListPanel_UpdateButton_Click(object sender, RoutedEventArgs e)
+		{
+			bool containsChecked;
+			var projectItems = GetCheckedOrSelectedReferences(ProjectListPanel, out containsChecked);
+			StartUpdater(ProjectListPanel, projectItems);
 		}
 
 		private void ReferenceListPanel_UpdateButton_Click(object sender, RoutedEventArgs e)
 		{
-			ThreadHelper.ThrowIfNotOnUIThread();
-			var args = new ProjectUpdaterParam();
-			var project = GetSelectedVsProject();
-			bool containsChecked;
-			var references = GetCheckedOrSelectedReferences(ReferenceListPanel, out containsChecked);
-			var action = containsChecked ? "Checked" : "Selected";
-			args.Data.Add(project, references);
-			var form = new MessageBoxWindow();
-			var result = form.ShowDialog($"Replace {references.Count} {action} references on {project?.Project?.Name} project?", "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question);
-			if (result != MessageBoxResult.OK)
+			var selectedProjectItem = (ReferenceItem)ProjectListPanel.MainDataGrid.SelectedItem;
+			if (selectedProjectItem == null)
 				return;
-			StartUpdate(args);
+			var projectItems = new List<ReferenceItem>() { selectedProjectItem };
+			bool containsChecked;
+			var referenceItems = GetCheckedOrSelectedReferences(ReferenceListPanel, out containsChecked);
+			StartUpdater(ReferenceListPanel, projectItems, referenceItems);
 		}
 
 		List<ReferenceItem> GetCheckedOrSelectedReferences(ProjectsListControl control, out bool containsChecked)
@@ -286,26 +323,6 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			if (control.ProjectsControlType == ProjectsControlType.References)
 				references = references.Where(x => x.StatusCode == MessageBoxImage.Information).ToList();
 			return references;
-		}
-
-		void StartUpdate(ProjectUpdaterParam state)
-		{
-			// Set progress controls.
-			_TaskPanel = ProjectListPanel.ScanProgressPanel;
-			_TaskTopLabel = ProjectListPanel.ProgressLevelTopLabel;
-			_TaskSubLabel = ProjectListPanel.ProgressLevelSubLabel;
-			_TaskTopBar = ProjectListPanel.ProgressLevelTopBar;
-			_TaskSubBar = ProjectListPanel.ProgressLevelSubBar;
-			// Begin.
-			Global.MainWindow.HMan.AddTask(TaskName.Update);
-			var success = System.Threading.ThreadPool.QueueUserWorkItem(ProjectUpdateTask, state);
-			if (!success)
-			{
-				_TaskTopLabel.Text = "Scan failed!";
-				_TaskSubLabel.Text = "";
-				_TaskPanel.Visibility = Visibility.Visible;
-				Global.MainWindow.HMan.RemoveTask(TaskName.Update);
-			}
 		}
 
 		ProjectUpdater _ProjectUpdater;

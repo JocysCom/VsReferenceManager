@@ -4,6 +4,6 @@ namespace JocysCom.VS.ReferenceManager
 {
 	public class ProjectUpdaterParam
 	{
-		public Dictionary<VSLangProj.VSProject, List<ReferenceItem>> Data = new Dictionary<VSLangProj.VSProject, List<ReferenceItem>>();
+		public Dictionary<VSLangProj.VSProject, IList<ReferenceItem>> Data = new Dictionary<VSLangProj.VSProject, IList<ReferenceItem>>();
 	}
 }

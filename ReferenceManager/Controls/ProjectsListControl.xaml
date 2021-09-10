@@ -68,7 +68,7 @@
 							Style="{StaticResource ToolBarButton}">
 							<StackPanel Style="{StaticResource ButtonStackPanel}">
 								<ContentControl Content="{StaticResource Icon_objects_exchange}" Style="{StaticResource ButtonContentControl}" />
-								<Label x:Name="UpdateButtonLabel" Content="Update references of Selected Projects" Style="{StaticResource ButtonLabel}" />
+								<Label x:Name="UpdateButtonLabel" Content="Update References" Style="{StaticResource ButtonLabel}" />
 							</StackPanel>
 						</Button>
 						<Button

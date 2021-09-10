@@ -58,10 +58,7 @@
 							<RowDefinition Height="Auto" />
 							<RowDefinition Height="*" />
 						</Grid.RowDefinitions>
-						<ToolBarPanel
-							Grid.Row="0"
-							HorizontalAlignment="Right"
-							Style="{StaticResource MainToolBarPanel}">
+						<ToolBarPanel Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource MainToolBarPanel}">
 							<ToolBar Style="{StaticResource MainToolBar}">
 								<Button
 									Name="LocationAddButton"

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Jocys.com VS Reference Manager")]
-[assembly: AssemblyDescription("Replace DLL references with project references.")]
+[assembly: AssemblyDescription("Update DLL references with project references.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Jocys.com")]
 [assembly: AssemblyProduct("VS Reference Manager")]
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.4.0.0")]
-[assembly: AssemblyFileVersion("1.4.0.0")]
+[assembly: AssemblyVersion("1.5.0.0")]
+[assembly: AssemblyFileVersion("1.5.0.0")]

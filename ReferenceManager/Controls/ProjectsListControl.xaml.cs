@@ -82,7 +82,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					updatable = list.Count(x => x.StatusCode == MessageBoxImage.Information);
 					var containsCheckedP = list.Any(x => x.IsChecked);
 					var actionP = containsCheckedP ? "Checked" : "Selected";
-					var bnP = $"Update references of {actionP} Projects";
+					var bnP = $"Update References of {actionP} Projects";
 					ControlsHelper.SetText(UpdateButtonLabel, bnP);
 					break;
 				case ProjectsControlType.References:
@@ -90,7 +90,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					updatable = list.Count(x => x.StatusCode == MessageBoxImage.Information);
 					var containsCheckedR = list.Any(x => x.IsChecked);
 					var action = containsCheckedR ? "Checked" : "Selected";
-					var bnR = $"Update {action} References To Projects";
+					var bnR = $"Update {action} References to Projects";
 					ControlsHelper.SetText(UpdateButtonLabel, bnR);
 					break;
 				case ProjectsControlType.ScanResults:
@@ -159,7 +159,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				case ProjectsControlType.Solution:
 					HeadLabel.Content = "Solution";
 					ShowColumns(SolutionNameColumn, SolutionPathColumn);
-					ShowButtons(RefreshButton);
+					ShowButtons(UpdateButton, RefreshButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_Visual_Studio];
 					break;
 				case ProjectsControlType.Projects:
@@ -170,7 +170,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					break;
 				case ProjectsControlType.References:
 					HeadLabel.Content = "References";
-					UpdateButtonLabel.Content = "Update Selected References To Projects";
+					UpdateButtonLabel.Content = "Update Selected References to Projects";
 					ShowColumns(IsCheckedColumn, StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ReferenceNameColumn, ReferencePathColumn);
 					ShowButtons(UpdateButton, RefreshButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_arrow_fork2];
