@@ -8,8 +8,7 @@ A long time ago CPUs and hard drives were much slower. Developers used to split 
 
 ## How it works
 
-Extension scans specified disk locations for C# (\*.csproj) and VB.NET (\*.vbproj) project files. Then, it will use that data to update \*.dll references with original Project references. When necessary, original Projects will be automatically added to under "References" solution folder.
-Location of extension's settings and data: C:\ProgramData\Jocys.com\VS Reference Manager\
+Extension scans specified disk locations for C# (\*.csproj) and VB.NET (\*.vbproj) project files. Then, it will use that data to update \*.dll references with original Project references. During update process, when necessary, original Projects will be automatically added under "References" solution folder. You can find extension settings and data here: C:\ProgramData\Jocys.com\VS Reference Manager\
 
 ## Update DLL references with Project references
 
