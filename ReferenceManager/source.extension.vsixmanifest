@@ -3,7 +3,8 @@
     <Metadata>
         <Identity Id="JocysCom.VS.ReferenceManager" Version="1.7" Language="en-US" Publisher="Jocys.com" />
         <DisplayName>VS Reference Manager</DisplayName>
-        <Description xml:space="preserve">Scan and update DLL references with Project references. Works with C# and VB.NET projects. Works with C# and VB.NET Projects.</Description>
+        <Description xml:space="preserve">This extension can find original 
+Visual Studio Projects of DLLs by scanning specified disk locations and update *.dll references with original Project references. Works with C# and VB.NET Projects.</Description>
         <Icon>App.ico</Icon>
     </Metadata>
     <Installation>
