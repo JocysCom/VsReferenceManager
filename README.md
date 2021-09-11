@@ -14,11 +14,9 @@ Extension scans specified disk locations for C# (\*.csproj) and VB.NET (\*.vbpro
 
 Before: Projects reference \*.dll assemblies:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img alt="Solution From" src="ReferenceManager/Documents/Images/Solution_From.png" width="340" height="340">
-
 After: Projects reference original Projects, which are also included under "References" solution folder:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img alt="Solution To" src="ReferenceManager/Documents/Images/Solution_To.png" width="340" height="370">
+&nbsp;&nbsp;&nbsp;&nbsp;<img alt="Solution From" src="ReferenceManager/Documents/Images/Solution_From.png" width="340" height="340"> ► <img alt="Solution To" src="ReferenceManager/Documents/Images/Solution_To.png" width="340" height="370">
 
 ## Screenshots
 
