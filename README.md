@@ -2,13 +2,13 @@
 
 Update \*.dll references with original Project references. Works with C# and VB.NET projects.
 
-## Why extension was created?
+## Why this extension was created?
 
 A long time ago CPUs and hard drives were much slower. Developers used to split projects into multiple solutions and used DLL references in order for Visual Studio to work faster. Today we have CPUs with more cores and blazing fast solid state drives (SSDs). Developers can load hundreds of projects into one Visual Studio solution, which also is much better for refactoring and debugging. This extension can find original Visual Studio Projects of DLLs by scanning specified disk locations and update \*.dll references with original Project references.
 
 ## How it works
 
-Extension scans specified locations with projects. Then it will use that date to replace project DLL references with Project references. Projects will be added to solution under "References" solution folder.
+Extension scans specified locations and looks for C# and VB.NET project files. Then, it will use that data to replace \*.dll references with original Project references in openned Solution. Projects will be added to Solution under "References" solution folder.
 
 ## Update DLL references with Project references
 
