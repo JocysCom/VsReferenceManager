@@ -14,12 +14,12 @@ Before: Projects reference \*.dll assemblies:
 
 After: Projects reference original Projects, which are also included under "References" solution folder:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img alt="Solution From" src="ReferenceManager/Documents/Images/Solution_From.png" width="340" height="370"> ► <img alt="Solution To" src="ReferenceManager/Documents/Images/Solution_To.png" width="340" height="370">
+<img alt="Solution From" src="ReferenceManager/Documents/Images/Solution_From.png" width="340" height="370"> ► <img alt="Solution To" src="ReferenceManager/Documents/Images/Solution_To.png" width="340" height="370">
 
 ## Screenshots
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img alt="Solution From" src="ReferenceManager/Documents/Images/Extension_Menu.png" width="390" height="138">
+<img alt="Solution From" src="ReferenceManager/Documents/Images/Extension_Menu.png" width="390" height="138">
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img alt="Solution From" src="ReferenceManager/Documents/Images/Extension_Step1.png" width="690" height="720">
+<img alt="Solution From" src="ReferenceManager/Documents/Images/Extension_Step1.png" width="690" height="720">
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img alt="Solution From" src="ReferenceManager/Documents/Images/Extension_Step2.png" width="690" height="720">
+<img alt="Solution From" src="ReferenceManager/Documents/Images/Extension_Step2.png" width="690" height="720">
