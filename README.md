@@ -2,7 +2,9 @@
 
 Update \*.dll references with original Project references. Works with C# and VB.NET projects.
 
-Download: <a href="https://marketplace.visualstudio.com/items?itemName=JocysCom.JocysComVsReferenceManager">VS Reference Manager - Visual Studio Marketplace</a>
+# Download
+
+Download latest version from <a href="https://marketplace.visualstudio.com/items?itemName=JocysCom.JocysComVsReferenceManager">VS Reference Manager - Visual Studio Marketplace</a>
 
 ## Why this extension was created?
 
