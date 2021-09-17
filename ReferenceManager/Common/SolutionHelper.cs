@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace JocysCom.VS.ReferenceManager
 {
-	public static class SolutionHelper
+	public static partial class SolutionHelper
 	{
 
 		public static DTE2 GetCurrentService()

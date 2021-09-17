@@ -10,6 +10,7 @@ using System.Windows.Documents;
 using System.Collections.Generic;
 using System.Xml;
 using System.Data;
+using System.Windows.Controls.Primitives;
 
 namespace JocysCom.ClassLibrary.Controls
 {
@@ -722,6 +723,57 @@ namespace JocysCom.ClassLibrary.Controls
 			if (selectFirst && grid.SelectedItems.Count == 0)
 				grid.SelectedItem = items[0];
 		}
+
+		#endregion
+
+		#region TextBoxBase
+
+		public static VerticalAlignment GetScrollVerticalAlignment(System.Windows.Controls.Primitives.TextBoxBase control)
+		{
+			// Vertical scroll position.
+			var offset = control.VerticalOffset;
+			// Vertical size of the scrollable content area.
+			var height = control.ViewportHeight;
+			// Vertical size of the visible content area.
+			var visibleView = control.ExtentHeight;
+			// Allow flexibility of 2 pixels.
+			var flex = 2;
+			if (offset + height - visibleView < flex)
+				return VerticalAlignment.Bottom;
+			if (offset < flex)
+				return VerticalAlignment.Top;
+			return VerticalAlignment.Center;
+		}
+
+		private static void AutoScroll(TextBoxBase control)
+		{
+			var scrollPosition = GetScrollVerticalAlignment(control);
+			if (scrollPosition == VerticalAlignment.Bottom && control.IsVisible)
+				control.ScrollToEnd();
+		}
+
+		public static void EnableAutoScroll(TextBoxBase control, bool enable = true)
+		{
+			control.TextChanged -= TextBoxBase_TextChanged;
+			control.IsVisibleChanged -= TextBoxBase_IsVisibleChanged;
+			control.Unloaded -= TextBoxBase_Unloaded;
+			if (enable)
+			{
+				control.TextChanged += TextBoxBase_TextChanged;
+				control.IsVisibleChanged += TextBoxBase_IsVisibleChanged;
+				control.Unloaded += TextBoxBase_Unloaded;
+			}
+		}
+
+		private static void TextBoxBase_Unloaded(object sender, RoutedEventArgs e)
+			=> EnableAutoScroll((TextBox)sender, false);
+
+		private static  void TextBoxBase_TextChanged(object sender, TextChangedEventArgs e)
+			=> AutoScroll((TextBox)sender);
+
+		private static void TextBoxBase_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+			=> AutoScroll((TextBox)sender);
+
 
 		#endregion
 

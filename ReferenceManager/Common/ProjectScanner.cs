@@ -1,4 +1,5 @@
 ﻿using JocysCom.ClassLibrary.Configuration;
+using JocysCom.ClassLibrary.Controls;
 using JocysCom.ClassLibrary.IO;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Xml.Linq;
 
 namespace JocysCom.VS.ReferenceManager
 {
-	public class ProjectScanner : IProgress<ProjectUpdaterEventArgs>
+	public class ProjectScanner : IProgress<ProgressEventArgs>
 	{
 
 		public ProjectScanner()
@@ -17,11 +18,15 @@ namespace JocysCom.VS.ReferenceManager
 			ff.FileFound += ff_FileFound;
 		}
 
+		private void ff_FileFound(object sender, ProgressEventArgs e)
+			=> Report(e);
+
+
 		#region ■ IProgress
 
-		public event EventHandler<ProjectUpdaterEventArgs> Progress;
+		public event EventHandler<ProgressEventArgs> Progress;
 
-		public void Report(ProjectUpdaterEventArgs e)
+		public void Report(ProgressEventArgs e)
 			=> Progress?.Invoke(this, e);
 
 		#endregion
@@ -81,9 +86,9 @@ namespace JocysCom.VS.ReferenceManager
 			IsStopping = false;
 			IsPaused = false;
 			// Step 1: Get list of files inside the folder.
-			var e = new ProjectUpdaterEventArgs
+			var e = new ProgressEventArgs
 			{
-				State = ProjectUpdaterStatus.Started
+				State = ProgressStatus.Started
 			};
 			Report(e);
 			var skipped = 0;
@@ -106,7 +111,7 @@ namespace JocysCom.VS.ReferenceManager
 			{
 				var file = files[i];
 				// If file doesn't exist in the game list then continue.
-				e = new ProjectUpdaterEventArgs
+				e = new ProgressEventArgs
 				{
 					TopMessage = $"Scan Files. Added = {added}, Skipped = {skipped}, Updated = {updated}",
 					TopIndex = i,
@@ -126,41 +131,22 @@ namespace JocysCom.VS.ReferenceManager
 				// If file doesn't exist current list then...
 				if (info == null)
 				{
-					e.State = ProjectUpdaterStatus.Updated;
+					e.State = ProgressStatus.Updated;
 					added++;
 				}
 				else
 				{
-					e.State = ProjectUpdaterStatus.Updated;
+					e.State = ProgressStatus.Updated;
 					updated++;
 				}
 				Report(e);
 			}
 			_DateEnded = DateTime.Now;
-			e = new ProjectUpdaterEventArgs
+			e = new ProgressEventArgs
 			{
-				State = ProjectUpdaterStatus.Completed
+				State = ProgressStatus.Completed
 			};
 			Report(e);
-		}
-
-		private void ff_FileFound(object sender, FileFinderEventArgs e)
-		{
-			var e2 = new ProjectUpdaterEventArgs
-			{
-				TopIndex = e.DirectoryIndex,
-				TopCount = e.Directories.Count,
-				TopData = e.Directories,
-				SubIndex = e.FileIndex,
-				SubCount = 0,
-				SubData = e.Files,
-				State = ProjectUpdaterStatus.Updated,
-			};
-			e2.TopMessage = $"Scan Folder: {e.Directories[e.DirectoryIndex].FullName}";
-			var file = e.Files[e.FileIndex];
-			var name = file.FullName;
-			e2.SubMessage = $"File: {name}";
-			Report(e2);
 		}
 
 		/// <summary>

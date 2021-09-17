@@ -147,20 +147,6 @@ namespace JocysCom.ClassLibrary.IO
 			return relativePath;
 		}
 
-		// Get Relative path (with ../../).
-		public static string GetPathRelative(string relativeTo, string path)
-		{
-			if (path == null)
-				throw new ArgumentNullException(nameof(path));
-			//if is not rooted then...
-			if (!System.IO.Path.IsPathRooted(path))
-				return path;
-			// Try to remove Absolute root part.
-			return IsPathPhysical(path)
-				? path.Replace(relativeTo + "\\", string.Empty)
-				: path.Replace("/", string.Empty);
-		}
-
 		// Get Relative path from any type of path.
 		public static string GetPathVirtual(string relativeTo, string path)
 		{

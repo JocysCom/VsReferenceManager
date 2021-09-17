@@ -235,8 +235,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			var success = System.Threading.ThreadPool.QueueUserWorkItem(ScanTask);
 			if (!success)
 			{
-				ProgressLevelTopLabel.Text = "Scan failed!";
-				ProgressLevelSubLabel.Text = "";
+				ScanProgressPanel.UpdateProgress("Scan failed!", "", true);
 				ScanButton.IsEnabled = true;
 				Global.MainWindow.HMan.RemoveTask(TaskName.Scan);
 			}
@@ -261,8 +260,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			}
 			ControlsHelper.Invoke(() =>
 			{
-				ProgressLevelTopLabel.Text = "...";
-				ProgressLevelSubLabel.Text = "";
+				ScanProgressPanel.UpdateProgress("...", "");
 				ScanProgressPanel.Visibility = Visibility.Visible;
 				ScanButton.IsEnabled = false;
 			});
@@ -274,7 +272,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			_Scanner.Scan(paths, currentInfo, name);
 		}
 
-		private void _Scanner_Progress(object sender, ProjectUpdaterEventArgs e)
+		private void _Scanner_Progress(object sender, ProgressEventArgs e)
 		{
 			if (ControlsHelper.InvokeRequired)
 			{
@@ -286,20 +284,20 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			var scanner = (ProjectScanner)sender;
 			switch (e.State)
 			{
-				case ProjectUpdaterStatus.Started:
-					UpdateProgress("Started...", "");
+				case ProgressStatus.Started:
+					ScanProgressPanel.UpdateProgress("Started...", "");
 					break;
-				case ProjectUpdaterStatus.Updated:
+				case ProgressStatus.Updated:
 					lock (AddAndUpdateLock)
 					{
 						if (e.SubData is List<ReferenceItem> ris)
 						foreach (var ri in ris)
 							ReferenceList.Add(ri);
 					}
-					UpdateProgress(e);
+					ScanProgressPanel.UpdateProgress(e);
 					break;
-				case ProjectUpdaterStatus.Completed:
-					UpdateProgress();
+				case ProgressStatus.Completed:
+					ScanProgressPanel.UpdateProgress();
 					ProjectScanner.CashedData.Save();
 					Global.ReferenceItems.Save();
 					ScanButton.IsEnabled = true;
@@ -378,63 +376,5 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			Global.MainWindow.HMan.Tasks.ListChanged += Tasks_ListChanged;
 		}
 
-		public void UpdateProgress(ProjectUpdaterEventArgs e)
-		{
-			if (e.TopCount > 0)
-			{
-				if (ProgressLevelTopBar.Maximum != e.TopCount)
-					ProgressLevelTopBar.Maximum = e.TopCount;
-				if (ProgressLevelTopBar.Value != e.TopIndex)
-					ProgressLevelTopBar.Value = e.TopIndex;
-
-			}
-			else
-			{
-				if (ProgressLevelTopBar.Maximum != 100)
-					ProgressLevelTopBar.Maximum = 100;
-				if (ProgressLevelTopBar.Value != 0)
-					ProgressLevelTopBar.Value = 0;
-
-			}
-			if (e.SubCount > 0)
-			{
-				if (ProgressLevelSubBar.Maximum != e.SubCount)
-					ProgressLevelSubBar.Maximum = e.SubCount;
-				if (ProgressLevelSubBar.Value != e.SubIndex)
-					ProgressLevelSubBar.Value = e.SubIndex;
-			}
-			else
-			{
-				if (ProgressLevelSubBar.Maximum != 100)
-					ProgressLevelSubBar.Maximum = 100;
-				if (ProgressLevelSubBar.Value != 0)
-					ProgressLevelSubBar.Value = 0;
-			}
-			// Create top message.
-			var tm = "";
-			if (e.TopCount > 0)
-				tm += $"{e.TopIndex}/{e.TopCount} - ";
-			tm += $"{e.TopMessage}";
-			// Create sub message.
-			var sm = "";
-			if (e.SubCount > 0)
-				sm += $"{e.SubIndex}/{e.SubCount} - ";
-			sm += $"{e.SubMessage}";
-			UpdateProgress(tm, sm);
-		}
-
-		public void UpdateProgress(string topText = "", string SubText = "", bool? resetBars = null)
-		{
-			ControlsHelper.SetText(ProgressLevelTopLabel, topText);
-			ControlsHelper.SetText(ProgressLevelSubLabel, SubText);
-			if (resetBars.GetValueOrDefault())
-			{
-				ProgressLevelTopBar.Maximum = 100;
-				ProgressLevelTopBar.Value = 0;
-				ProgressLevelSubBar.Maximum = 100;
-				ProgressLevelSubBar.Value = 0;
-			}
-			ControlsHelper.SetVisible(ScanProgressPanel, !string.IsNullOrEmpty(topText));
-		}
 	}
 }

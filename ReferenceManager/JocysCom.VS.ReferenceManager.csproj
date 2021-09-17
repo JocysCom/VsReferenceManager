@@ -49,15 +49,15 @@
     <Compile Include="Common\AppData.cs" />
     <Compile Include="Common\Global.cs" />
     <Compile Include="Common\ProjectFileInfo.cs" />
+    <Compile Include="Info\ProjectOutputType.cs" />
     <Compile Include="Common\ProjectScanner.cs" />
     <Compile Include="Common\ProjectScannerStatus.cs" />
     <Compile Include="Common\ProjectsControlType.cs" />
     <Compile Include="Common\ProjectUpdater.cs" />
-    <Compile Include="Common\ProjectUpdaterEventArgs.cs" />
     <Compile Include="Common\ProjectUpdaterParam.cs" />
-    <Compile Include="Common\ProjectUpdaterStatus.cs" />
     <Compile Include="Common\ReferenceItem.cs" />
     <Compile Include="Common\SolutionHelper.cs" />
+    <Compile Include="Info\InfoHelper.cs" />
     <Compile Include="Common\TaskName.cs" />
     <Compile Include="Controls\MainControl.xaml.cs">
       <DependentUpon>MainControl.xaml</DependentUpon>
@@ -69,6 +69,7 @@
       <DependentUpon>ProjectsListControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\ItemFormattingConverter.cs" />
+    <Compile Include="Info\ConfigInfo.cs" />
     <Compile Include="JocysCom\ComponentModel\BindingListInvoked.cs" />
     <Compile Include="JocysCom\ComponentModel\PropertyComparer.cs" />
     <Compile Include="JocysCom\ComponentModel\SortableBindingList.cs" />
@@ -83,6 +84,11 @@
     <Compile Include="JocysCom\Controls\MessageBoxWindow.xaml.cs">
       <DependentUpon>MessageBoxWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="JocysCom\Controls\ProgressBarControl.xaml.cs">
+      <DependentUpon>ProgressBarControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="JocysCom\Controls\ProgressEventArgs.cs" />
+    <Compile Include="JocysCom\Controls\ProgressStatus.cs" />
     <Compile Include="JocysCom\Controls\TabIndexConverter.cs" />
     <Compile Include="JocysCom\Controls\Themes\Icons.xaml.cs">
       <DependentUpon>Icons.xaml</DependentUpon>
@@ -90,7 +96,6 @@
     <Compile Include="JocysCom\Files\Csv.cs" />
     <Compile Include="JocysCom\Files\CsvQuote.cs" />
     <Compile Include="JocysCom\IO\FileFinder.cs" />
-    <Compile Include="JocysCom\IO\FileFinderEventArgs.cs" />
     <Compile Include="JocysCom\IO\PathHelper.cs" />
     <Compile Include="JocysCom\Runtime\Serializer.cs" />
     <Compile Include="MainWindow.cs" />
@@ -184,6 +189,10 @@
     <Page Include="JocysCom\Controls\MessageBoxWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="JocysCom\Controls\ProgressBarControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="JocysCom\Controls\Themes\Default.xaml">
       <Generator>MSBuild:Compile</Generator>

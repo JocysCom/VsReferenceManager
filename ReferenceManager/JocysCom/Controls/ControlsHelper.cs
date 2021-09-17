@@ -221,15 +221,6 @@ namespace JocysCom.ClassLibrary.Controls
 				return null;
 			var t = item.GetType();
 			PropertyInfo pi = null;
-			// Try to find property by EntityFramework EdmScalarPropertyAttribute.
-			pi = t.GetProperties()
-				.Where(x =>
-					x.GetCustomAttributes(typeof(System.Data.Objects.DataClasses.EdmScalarPropertyAttribute), true)
-					.Cast<System.Data.Objects.DataClasses.EdmScalarPropertyAttribute>()
-					.Any(a => a.EntityKeyProperty))
-				.FirstOrDefault();
-			if (pi != null)
-				return pi;
 #if NETCOREAPP // .NET Core
 			// Try to find property by KeyAttribute.
 			pi = t.GetProperties()
@@ -237,6 +228,17 @@ namespace JocysCom.ClassLibrary.Controls
 				.FirstOrDefault();
 			if (pi != null)
 				return pi;
+#else
+				// Try to find property by EntityFramework EdmScalarPropertyAttribute (System.Data.Entity.dll).
+				pi = t.GetProperties()
+					.Where(x =>
+						x.GetCustomAttributes(typeof(System.Data.Objects.DataClasses.EdmScalarPropertyAttribute), true)
+						.Cast<System.Data.Objects.DataClasses.EdmScalarPropertyAttribute>()
+						.Any(a => a.EntityKeyProperty))
+					.FirstOrDefault();
+			if (pi != null)
+				return pi;
+
 #endif
 			return null;
 		}

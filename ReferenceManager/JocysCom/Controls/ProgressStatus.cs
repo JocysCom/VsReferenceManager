@@ -1,6 +1,6 @@
-﻿namespace JocysCom.VS.ReferenceManager
+﻿namespace JocysCom.ClassLibrary.Controls
 {
-	public enum ProjectUpdaterStatus
+	public enum ProgressStatus
 	{
 		None = 0,
 		Started,
@@ -8,5 +8,6 @@
 		Updated,
 		Deleted,
 		Completed,
+		Exception,
 	}
 }

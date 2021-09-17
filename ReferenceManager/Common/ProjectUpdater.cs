@@ -10,24 +10,24 @@ using System.Linq;
 namespace JocysCom.VS.ReferenceManager
 {
 
-	public partial class ProjectUpdater : IProgress<ProjectUpdaterEventArgs>
+	public partial class ProjectUpdater : IProgress<ProgressEventArgs>
 	{
 
 		#region ■ IProgress
 
-		public event EventHandler<ProjectUpdaterEventArgs> Progress;
+		public event EventHandler<ProgressEventArgs> Progress;
 
-		public void Report(ProjectUpdaterEventArgs e)
+		public void Report(ProgressEventArgs e)
 			=> Progress?.Invoke(this, e);
 
 		#endregion
 
 		public void ProcessData(ProjectUpdaterParam param)
 		{
-			var e = new ProjectUpdaterEventArgs();
+			var e = new ProgressEventArgs();
 			// Create "References" solution folder.
 			e.TopMessage = "Checking 'References' virtual solution folder...";
-			e.State = ProjectUpdaterStatus.Started;
+			e.State = ProgressStatus.Started;
 			Report(e);
 			SolutionFolder folder = null;
 			ControlsHelper.Invoke(() =>
@@ -43,7 +43,7 @@ namespace JocysCom.VS.ReferenceManager
 				{
 					ThreadHelper.ThrowIfNotOnUIThread();
 					project = projects[p];
-					e.State = ProjectUpdaterStatus.Updated;
+					e.State = ProgressStatus.Updated;
 					e.TopIndex = p;
 					e.TopCount = projects.Count;
 					e.TopData = project;
@@ -99,9 +99,9 @@ namespace JocysCom.VS.ReferenceManager
 					});
 				}
 			}
-			e = new ProjectUpdaterEventArgs
+			e = new ProgressEventArgs
 			{
-				State = ProjectUpdaterStatus.Completed
+				State = ProgressStatus.Completed
 			};
 			Report(e);
 			ControlsHelper.Invoke(() =>

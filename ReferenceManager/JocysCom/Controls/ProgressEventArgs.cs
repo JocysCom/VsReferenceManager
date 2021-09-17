@@ -1,8 +1,12 @@
-﻿namespace JocysCom.VS.ReferenceManager
+﻿using System;
+
+namespace JocysCom.ClassLibrary.Controls
 {
-	public class ProjectUpdaterEventArgs
+	public class ProgressEventArgs
 	{
-		public ProjectUpdaterStatus State { get; set; }
+
+		public ProgressStatus State { get; set; }
+		public Exception Exception;
 
 		// --------------------------
 		// Top Level
