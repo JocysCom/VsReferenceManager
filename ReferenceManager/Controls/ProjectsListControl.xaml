@@ -237,7 +237,6 @@
 				</DataGrid>
 				<JcControls:ProgressBarControl x:Name="ScanProgressPanel" Grid.Row="2" x:FieldModifier="public" />
 			</Grid>
-
 		</TabItem>
 	</TabControl>
 </UserControl>

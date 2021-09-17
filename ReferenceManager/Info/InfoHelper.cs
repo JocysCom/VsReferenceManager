@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -15,66 +16,32 @@ namespace JocysCom.VS.ReferenceManager.Info
 	{
 
 		/// <summary>
-		/// Read assembly files and return version.
-		/// </summary>
-		public static string FindVersion(string assemblyVersion, params string[] paths)
-		{
-			if (string.IsNullOrEmpty(assemblyVersion))
-				return null;
-			if (assemblyVersion == "1.0.*")
-				return assemblyVersion;
-			var rx = new Regex("\\s+");
-			var p = assemblyVersion.Split('.').LastOrDefault().Replace("FileVersion", "Version").Replace("Version", "FileVersion");
-			//Console.WriteLine("FindVersion: {0}", assemblyVersion);
-			foreach (var path in paths)
-			{
-				var fi = new FileInfo(path);
-				if (!fi.Exists)
-				{
-					//Console.WriteLine("FindVersion(...): file not found: {0}", path);
-					continue;
-				}
-				//Console.WriteLine("    {0}", path);
-				var contents = File.ReadAllText(path);
-				// remove all spaces to make ti easier
-				var mvRx = new Regex(@"string\s+MajorVersion\s*=\s*""(?<version>[0-9.]+)""");
-				var mvMatch = mvRx.Match(contents);
-				if (mvMatch.Success)
-				{
-					//Console.WriteLine("MajorVersion: {0}", mvMatch.Groups["version"].Value);
-					var verRx = new Regex(@"string\s+" + p + @"\s*=\s*MajorVersion\s*\+\s*""(?<version>[0-9.]+)""");
-					var verMatch = verRx.Match(contents);
-					if (verMatch.Success)
-					{
-						var ver = string.Format("{0}{1}", mvMatch.Groups["version"].Value, verMatch.Groups["version"].Value);
-						Console.WriteLine("{0}: {1}", p, ver);
-						return ver;
-					}
-				}
-			}
-			Console.WriteLine("{0}: version not found", p);
-			return null;
-		}
-
-		/// <summary>
 		/// Get value from AssemblyFile content.
 		/// </summary>
-		static string GetAssemblyValue(string name, string contents)
+		public static string GetAssemblyValue(string name, string contents)
 		{
-			var rx = new Regex(@"\[assembly\s*:\s*" + name + @"\s*\(\s*""?(?<value>[^""\)\]]*)""?\s*\)\s*\]", RegexOptions.Singleline);
-			var match = rx.Match(contents);
-			return match.Success
-				? match.Groups["value"].Value
-				: null;
+			Regex rx;
+			Match match;
+			rx = new Regex(@"\[assembly\s*:\s*" + name + @"\s*\(\s*""?(?<value>[^""\)\]]*)""?\s*\)\s*\]", RegexOptions.Singleline);
+			match = rx.Match(contents);
+			if (match.Success)
+				return match.Groups["value"].Value;
+			rx = new Regex(@"<Assembly\s*:\s*" + name + @"\s*\(\s*""?(?<value>[^""\)\]]*)""?\s*\)\s*>", RegexOptions.Singleline);
+			match = rx.Match(contents);
+			if (match.Success)
+				return match.Groups["value"].Value;
+			return null;
 		}
 
 		/// <summary>
 		/// Set value inside AssemblyFile content.
 		/// </summary>
-		static void SetAssemblyValue(string name, string value, ref string contents)
+		public static void SetAssemblyValue(string name, string value, ref string contents)
 		{
-			var rx = new Regex(@"\[assembly\s*:\s*" + name + @"\s*\(\s*""?(?<value>[^""\)\]]*)""?\s*\)\s*\]", RegexOptions.Singleline);
-			contents = rx.Replace(contents, string.Format("[assembly: {0}(\"{1}\")]", name, value));
+			var rxCs = new Regex(@"\[assembly\s*:\s*" + name + @"\s*\(\s*""?(?<value>[^""\)\]]*)""?\s*\)\s*\]", RegexOptions.Singleline);
+			contents = rxCs.Replace(contents, string.Format("[assembly: {0}(\"{1}\")]", name, value));
+			var rxVb = new Regex(@"<Assembly\s*:\s*" + name + @"\s*\(\s*""?(?<value>[^""\)\]]*)""?\s*\)\s*\]", RegexOptions.Singleline);
+			contents = rxVb.Replace(contents, string.Format("<Assembly: {0}(\"{1}\")]", name, value));
 		}
 
 		/// <summary>
@@ -92,7 +59,7 @@ namespace JocysCom.VS.ReferenceManager.Info
 			var isWin = outputType.ToUpper().Contains("WIN");
 			var isLib = outputType.ToUpper().Contains("LIBRARY");
 			var rxWeb = new Regex("web\\.config", RegexOptions.IgnoreCase);
-			var rxSrv = new Regex("Service|Server|API", RegexOptions.IgnoreCase);
+			var rxSrv = new Regex("Service|Server|API|\\.Ws", RegexOptions.IgnoreCase);
 			var rxTst = new Regex("Tester", RegexOptions.IgnoreCase);
 			//if (rxTst.IsMatch(projectName))
 			var isSrv = rxSrv.IsMatch(projectName) && !rxTst.IsMatch(projectName);
@@ -119,8 +86,9 @@ namespace JocysCom.VS.ReferenceManager.Info
 			return ProjectOutputType.Unknown;
 		}
 
+
 		/// <summary>
-		/// Get all child nodes.
+		/// Get all child controls.
 		/// </summary>
 		public static T[] GetAll<T>(XmlNode node, bool includeTop = false)
 		{
@@ -142,6 +110,18 @@ namespace JocysCom.VS.ReferenceManager.Info
 			var result2 = result.Select(x => (T)(object)x).ToArray();
 			return result2;
 		}
+
+		static string GetElementInnerText(string path, string tag)
+		{
+			var rx = new Regex("<" + tag + ">(?<type>[\\w\\. ]+)</" + tag + ">", RegexOptions.IgnoreCase);
+			var projContent = File.ReadAllText(path);
+			var match = rx.Match(projContent);
+			if (!match.Success)
+				return null;
+			var value = match.Groups["type"].Value;
+			return value;
+		}
+
 
 		static void GetConfigurations(DirectoryInfo dir, out List<ConfigInfo> configs)
 		{
@@ -184,11 +164,10 @@ namespace JocysCom.VS.ReferenceManager.Info
 				if (builder == null)
 					continue;
 				var cs = GetBasicConnection(builder).ToUpper();
-				if (!strings.Contains(cs))
-				{
-					strings.Add(cs);
-					builders.Add(builder);
-				}
+				if (strings.Contains(cs))
+					continue;
+				strings.Add(cs);
+				builders.Add(builder);
 			}
 			// Look for connection strings inside elements.
 			foreach (var element in elements)
@@ -200,11 +179,10 @@ namespace JocysCom.VS.ReferenceManager.Info
 				if (builder == null)
 					continue;
 				var cs = GetBasicConnection(builder).ToUpper();
-				if (!strings.Contains(cs))
-				{
-					strings.Add(cs);
-					builders.Add(builder);
-				}
+				if (strings.Contains(cs))
+					continue;
+				strings.Add(cs);
+				builders.Add(builder);
 			}
 		}
 
@@ -275,6 +253,71 @@ namespace JocysCom.VS.ReferenceManager.Info
 			}
 			return s;
 		}
+
+		#region Solution and Project Methods
+
+
+		static FileInfo[] GetFiles(DirectoryInfo dir, string searchPattern)
+		{
+			Console.Write("Searching for {0}...", searchPattern);
+			var files = dir.GetFiles(searchPattern, SearchOption.AllDirectories).OrderBy(x => x.FullName).ToArray();
+			// Exclude all build folders.
+			var rxBuild = new Regex(@"\\obj\\|\\bin\\", RegexOptions.IgnoreCase);
+			files = files.Where(x => !rxBuild.IsMatch(x.FullName)).ToArray();
+			Console.WriteLine(" {0} files found.", files.Length);
+			return files;
+		}
+
+		/// <summary>
+		/// Get all solutions with list of all projects in them.
+		/// </summary>
+		/// <param name="dir">Root folder to search for solutions.</param>
+		public static List<SolutionInfo> GetSolutionsWithProjects(string scanPath)
+		{
+			var solutions = new List<SolutionInfo>();
+			// Find all solution files.
+			var dir = new DirectoryInfo(scanPath);
+			var slns = GetFiles(dir, "*.sln");
+			for (int s = 0; s < slns.Length; s++)
+			{
+				var si = new SolutionInfo();
+				si.File = slns[s];
+				var solution = Microsoft.Build.Construction.SolutionFile.Parse(si.File.FullName);
+				solutions.Add(si);
+				var solutionProjects = solution.ProjectsInOrder;
+				for (int p = 0; p < solutionProjects.Count; p++)
+				{
+					var solutionProject = solutionProjects[p];
+					var fullName = Path.Combine(si.File.Directory.FullName, solutionProject.RelativePath);
+					// Fix dot notations.
+					fullName = Path.GetFullPath(fullName);
+					if (si.Projects.Any(x => x.File.FullName == fullName))
+						continue;
+					var pi = new ProjectInfo();
+					pi.File = new FileInfo(fullName);
+					// if this is folder then...
+					if (pi.File.Attributes.HasFlag(FileAttributes.Directory))
+					{
+						var newPath = Path.Combine(pi.File.Directory.FullName, "website.publishproj");
+						pi.File = new FileInfo(newPath);
+					}
+					// Skip if project exists.
+					if (!pi.File.Exists)
+						continue;
+					pi.ProjectName = solutionProject.ProjectName;
+					pi.RelativePath = solutionProject.RelativePath;
+					pi.ProjectGuid = solutionProject.ProjectGuid;
+					pi.ProjectType = solutionProject.ProjectType;
+					pi.OutputType = GetOutputType(pi.File.FullName, solutionProject.ProjectName);
+					pi.AssemblyName = GetElementInnerText(pi.File.FullName, "AssemblyName");
+					si.Projects.Add(pi);
+				}
+				solutions.Add(si);
+			}
+			return solutions;
+		}
+
+		#endregion
 
 
 	}
