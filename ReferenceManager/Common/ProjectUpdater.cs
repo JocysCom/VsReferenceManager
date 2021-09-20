@@ -1,10 +1,7 @@
-﻿
-using EnvDTE;
-using EnvDTE80;
+﻿using EnvDTE80;
 using JocysCom.ClassLibrary.Controls;
 using Microsoft.VisualStudio.Shell;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace JocysCom.VS.ReferenceManager
@@ -106,7 +103,7 @@ namespace JocysCom.VS.ReferenceManager
 			Report(e);
 			ControlsHelper.Invoke(() =>
 			{
-				Global.MainWindow.HMan.RemoveTask(TaskName.Update);
+				Global.MainWindow.InfoPanel.HMan.RemoveTask(TaskName.Update);
 			});
 		}
 

@@ -25,13 +25,17 @@
 				x:Name="ProgressLevelTopBarTextBlock"
 				Grid.Row="0"
 				Grid.Column="0"
+				Margin="0,2,0,4"
 				HorizontalAlignment="Center"
-				VerticalAlignment="Center" />
+				VerticalAlignment="Center"
+				Foreground="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+				Text="[x/y]" />
 			<TextBlock
 				x:Name="ProgressLevelTopLabel"
 				Grid.Row="0"
 				Grid.Column="1"
 				Margin="4,0,0,0"
+				VerticalAlignment="Center"
 				Text="[ProgressLevelTopLabel]" />
 			<ProgressBar
 				x:Name="ProgressLevelSubBar"
@@ -43,13 +47,17 @@
 				x:Name="ProgressLevelSubBarTextBlock"
 				Grid.Row="1"
 				Grid.Column="0"
+				Margin="0,2,0,4"
 				HorizontalAlignment="Center"
-				VerticalAlignment="Center" />
+				VerticalAlignment="Center"
+				Foreground="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+				Text="[x/y]" />
 			<TextBlock
 				x:Name="ProgressLevelSubLabel"
 				Grid.Row="1"
 				Grid.Column="1"
 				Margin="4,0,0,0"
+				VerticalAlignment="Center"
 				Text="[ProgressLevelSubLabel]" />
 		</Grid>
 	</StackPanel>

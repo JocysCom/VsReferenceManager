@@ -25,20 +25,10 @@ namespace JocysCom.VS.ReferenceManager
 				Global.AppData.Items.Add(new AppData());
 				Global.AppData.Save();
 			}
-			this.InitializeComponent();
-			HMan = new BaseWithHeaderManager<TaskName>(HelpHeadLabel, HelpBodyLabel, LeftIcon, RightIcon, this);
-			var assembly = Assembly.GetExecutingAssembly();
-			//var company = ((AssemblyCompanyAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyCompanyAttribute))).Company;
-			var product = ((AssemblyProductAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyProductAttribute))).Product;
-			//var title = ((AssemblyTitleAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute))).Title;
-			var description = ((AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute))).Description;
-			HMan.SetBodyInfo(description);
-			HMan.SetHead(product);
+			InitializeComponent();
 		}
 
-		public BaseWithHeaderManager<TaskName> HMan;
-
-		private void MainWindowPanel_Unloaded(object sender, RoutedEventArgs e)
+	private void MainWindowPanel_Unloaded(object sender, RoutedEventArgs e)
 		{
 			Global.AppData.Save();
 			Global.ReferenceItems.Save();

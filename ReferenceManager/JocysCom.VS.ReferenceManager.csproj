@@ -83,6 +83,9 @@
     <Compile Include="JocysCom\Controls\ControlsHelper.cs" />
     <Compile Include="JocysCom\Controls\ControlsHelper.WPF.cs" />
     <Compile Include="JocysCom\Controls\IBaseWithHeaderControl.cs" />
+    <Compile Include="JocysCom\Controls\InfoControl.xaml.cs">
+      <DependentUpon>InfoControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="JocysCom\Controls\MessageBoxWindow.xaml.cs">
       <DependentUpon>MessageBoxWindow.xaml</DependentUpon>
     </Compile>
@@ -189,6 +192,10 @@
     <Page Include="Controls\ProjectsListControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="JocysCom\Controls\InfoControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="JocysCom\Controls\MessageBoxWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

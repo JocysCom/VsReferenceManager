@@ -303,12 +303,12 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			// Set progress controls.
 			_TaskControl = control;
 			// Begin.
-			Global.MainWindow.HMan.AddTask(TaskName.Update);
+			Global.MainWindow.InfoPanel.HMan.AddTask(TaskName.Update);
 			var success = System.Threading.ThreadPool.QueueUserWorkItem(ProjectUpdateTask, param);
 			if (!success)
 			{
 				_TaskControl.ScanProgressPanel.UpdateProgress("Scan failed!", "", true);
-				Global.MainWindow.HMan.RemoveTask(TaskName.Update);
+				Global.MainWindow.InfoPanel.HMan.RemoveTask(TaskName.Update);
 			}
 		}
 
@@ -389,7 +389,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					UpdateSolution();
 					UpdateProjects();
 					UpdateReferences();
-					Global.MainWindow.HMan.RemoveTask(TaskName.Update);
+					Global.MainWindow.InfoPanel.HMan.RemoveTask(TaskName.Update);
 					break;
 				default:
 					break;

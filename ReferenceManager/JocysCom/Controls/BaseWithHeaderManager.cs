@@ -19,7 +19,6 @@ namespace JocysCom.ClassLibrary.Controls
 			defaultBody = bodyLabel.Text;
 			_LeftIcon = leftIcon;
 			_RightIcon = rightIcon;
-			_RightIconOriginalContent = _RightIcon.Content;
 			_RotateTransform = new RotateTransform();
 			_RightIcon.RenderTransform = _RotateTransform;
 			_RightIcon.RenderTransformOrigin = new Point(0.5, 0.5);
@@ -65,6 +64,7 @@ namespace JocysCom.ClassLibrary.Controls
 		{
 			if (Tasks.Count > 0)
 			{
+				_RightIconOriginalContent = _RightIcon.Content;
 				_RightIcon.Content = Icons.Current[Icons.Icon_ProcessRight];
 				_RightIcon.RenderTransform = _RotateTransform;
 				RotateTimer.Start();
