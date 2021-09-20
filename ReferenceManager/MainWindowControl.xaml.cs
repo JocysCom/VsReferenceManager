@@ -1,7 +1,4 @@
-﻿using JocysCom.ClassLibrary.Configuration;
-using JocysCom.ClassLibrary.Controls;
-using System;
-using System.Reflection;
+﻿using JocysCom.ClassLibrary.Controls;
 using System.Windows;
 using System.Windows.Controls;
 

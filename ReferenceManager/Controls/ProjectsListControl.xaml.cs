@@ -229,7 +229,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			if (result != MessageBoxResult.OK)
 				return;
 			ScanButton.IsEnabled = false;
-			Global.MainWindow.InfoPanel.HMan.AddTask(TaskName.Scan);
+			Global.MainWindow.InfoPanel.AddTask(TaskName.Scan);
 			ScanStarted = DateTime.Now;
 			ReferenceList.Clear();
 			var success = System.Threading.ThreadPool.QueueUserWorkItem(ScanTask);
@@ -237,7 +237,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			{
 				ScanProgressPanel.UpdateProgress("Scan failed!", "", true);
 				ScanButton.IsEnabled = true;
-				Global.MainWindow.InfoPanel.HMan.RemoveTask(TaskName.Scan);
+				Global.MainWindow.InfoPanel.RemoveTask(TaskName.Scan);
 			}
 		}
 
@@ -301,7 +301,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					ProjectScanner.CashedData.Save();
 					Global.ReferenceItems.Save();
 					ScanButton.IsEnabled = true;
-					Global.MainWindow.InfoPanel.HMan.RemoveTask(TaskName.Scan);
+					Global.MainWindow.InfoPanel.RemoveTask(TaskName.Scan);
 					break;
 				default:
 					break;
@@ -344,7 +344,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					.Count(x => x.StatusCode == MessageBoxImage.Information) > 0;
 
 			}
-			var isBusy = (Global.MainWindow?.InfoPanel?.HMan?.Tasks?.Count ?? 0) > 0;
+			var isBusy = (Global.MainWindow?.InfoPanel?.Tasks?.Count ?? 0) > 0;
 			UpdateButton.IsEnabled = !isBusy && allowEnable;
 		}
 
@@ -372,8 +372,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		{
 			if (ControlsHelper.IsDesignMode(this))
 				return;
-			Global.MainWindow.InfoPanel.HMan.Tasks.ListChanged -= Tasks_ListChanged;
-			Global.MainWindow.InfoPanel.HMan.Tasks.ListChanged += Tasks_ListChanged;
+			Global.MainWindow.InfoPanel.Tasks.ListChanged -= Tasks_ListChanged;
+			Global.MainWindow.InfoPanel.Tasks.ListChanged += Tasks_ListChanged;
 		}
 
 	}

@@ -103,7 +103,7 @@ namespace JocysCom.VS.ReferenceManager
 			Report(e);
 			ControlsHelper.Invoke(() =>
 			{
-				Global.MainWindow.InfoPanel.HMan.RemoveTask(TaskName.Update);
+				Global.MainWindow.InfoPanel.RemoveTask(TaskName.Update);
 			});
 		}
 
