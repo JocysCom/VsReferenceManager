@@ -1,4 +1,5 @@
 ﻿using JocysCom.ClassLibrary.Configuration;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
@@ -60,6 +61,9 @@ namespace JocysCom.VS.ReferenceManager
 
 		[XmlIgnore]
 		public object Tag;
+
+		[XmlIgnore]
+		public List<Info.ProjectInfo> Projects { get; set; } = new List<Info.ProjectInfo>();
 
 		#region ■ ISettingsItem
 		bool ISettingsItem.Enabled { get => IsEnabled; set => IsEnabled = value; }

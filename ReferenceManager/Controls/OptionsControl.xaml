@@ -2,7 +2,6 @@
 	x:Class="JocysCom.VS.ReferenceManager.Controls.OptionsControl"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:common="clr-namespace:JocysCom.VS.ReferenceManager"
 	xmlns:controls="clr-namespace:JocysCom.VS.ReferenceManager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -109,11 +108,11 @@
 				</StackPanel>
 			</TabItem>
 		</TabControl>
-		<controls:ProjectsListControl
+		<controls:ReferenceListControl
 			x:Name="ProjectsListPanel"
 			Grid.Row="1"
 			Grid.Column="0"
 			Grid.ColumnSpan="2"
-			ProjectsControlType="ScanResults" />
+			ProjectsControlType="ProjectScanner" />
 	</Grid>
 </UserControl>

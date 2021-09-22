@@ -15,8 +15,7 @@ namespace JocysCom.VS.ReferenceManager
 		public MainWindowControl()
 		{
 			ControlsHelper.InitInvokeContext();
-			Global.AppData.Load();
-			Global.ReferenceItems.Load();
+			Global.LoadSettings();
 			if (Global.AppData.Items.Count == 0)
 			{
 				Global.AppData.Items.Add(new AppData());
@@ -27,8 +26,7 @@ namespace JocysCom.VS.ReferenceManager
 
 	private void MainWindowPanel_Unloaded(object sender, RoutedEventArgs e)
 		{
-			Global.AppData.Save();
-			Global.ReferenceItems.Save();
+			Global.SaveSettings();
 		}
 
 	}

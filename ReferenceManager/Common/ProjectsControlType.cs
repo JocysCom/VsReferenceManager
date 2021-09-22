@@ -6,6 +6,7 @@
 		Solution,
 		Projects,
 		References,
-		ScanResults,
+		ProjectScanner,
+		SolutionScanner,
 	}
 }

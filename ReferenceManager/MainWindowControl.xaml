@@ -54,6 +54,19 @@
 				</TabItem.Header>
 				<controls:MainControl x:Name="MainPanel" />
 			</TabItem>
+			<TabItem>
+				<TabItem.Header>
+					<StackPanel Orientation="Horizontal">
+						<ContentControl
+							Width="12"
+							Height="12"
+							VerticalAlignment="Center"
+							Content="{StaticResource Icon_elements_tree}" />
+						<Label Padding="4,0,0,0" VerticalAlignment="Center" Content="Scan Solutions" />
+					</StackPanel>
+				</TabItem.Header>
+				<controls:SolutionsControl x:Name="SolutionsPanel" />
+			</TabItem>
 		</TabControl>
 	</Grid>
 </UserControl>

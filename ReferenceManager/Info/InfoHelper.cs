@@ -47,7 +47,7 @@ namespace JocysCom.VS.ReferenceManager.Info
 		/// <summary>
 		///  Get project output type from *.*proj file.
 		/// </summary>
-		static ProjectOutputType GetOutputType(string path, string projectName)
+		public static ProjectOutputType GetOutputType(string path, string projectName)
 		{
 			var input = File.ReadAllText(path);
 			var rx = new Regex("<OutputType>(?<type>\\w+)</OutputType>", RegexOptions.IgnoreCase);
@@ -111,7 +111,7 @@ namespace JocysCom.VS.ReferenceManager.Info
 			return result2;
 		}
 
-		static string GetElementInnerText(string path, string tag)
+		public static string GetElementInnerText(string path, string tag)
 		{
 			var rx = new Regex("<" + tag + ">(?<type>[\\w\\. ]+)</" + tag + ">", RegexOptions.IgnoreCase);
 			var projContent = File.ReadAllText(path);
@@ -266,55 +266,6 @@ namespace JocysCom.VS.ReferenceManager.Info
 			files = files.Where(x => !rxBuild.IsMatch(x.FullName)).ToArray();
 			Console.WriteLine(" {0} files found.", files.Length);
 			return files;
-		}
-
-		/// <summary>
-		/// Get all solutions with list of all projects in them.
-		/// </summary>
-		/// <param name="dir">Root folder to search for solutions.</param>
-		public static List<SolutionInfo> GetSolutionsWithProjects(string scanPath)
-		{
-			var solutions = new List<SolutionInfo>();
-			// Find all solution files.
-			var dir = new DirectoryInfo(scanPath);
-			var slns = GetFiles(dir, "*.sln");
-			for (int s = 0; s < slns.Length; s++)
-			{
-				var si = new SolutionInfo();
-				si.File = slns[s];
-				var solution = Microsoft.Build.Construction.SolutionFile.Parse(si.File.FullName);
-				solutions.Add(si);
-				var solutionProjects = solution.ProjectsInOrder;
-				for (int p = 0; p < solutionProjects.Count; p++)
-				{
-					var solutionProject = solutionProjects[p];
-					var fullName = Path.Combine(si.File.Directory.FullName, solutionProject.RelativePath);
-					// Fix dot notations.
-					fullName = Path.GetFullPath(fullName);
-					if (si.Projects.Any(x => x.File.FullName == fullName))
-						continue;
-					var pi = new ProjectInfo();
-					pi.File = new FileInfo(fullName);
-					// if this is folder then...
-					if (pi.File.Attributes.HasFlag(FileAttributes.Directory))
-					{
-						var newPath = Path.Combine(pi.File.Directory.FullName, "website.publishproj");
-						pi.File = new FileInfo(newPath);
-					}
-					// Skip if project exists.
-					if (!pi.File.Exists)
-						continue;
-					pi.ProjectName = solutionProject.ProjectName;
-					pi.RelativePath = solutionProject.RelativePath;
-					pi.ProjectGuid = solutionProject.ProjectGuid;
-					pi.ProjectType = solutionProject.ProjectType;
-					pi.OutputType = GetOutputType(pi.File.FullName, solutionProject.ProjectName);
-					pi.AssemblyName = GetElementInnerText(pi.File.FullName, "AssemblyName");
-					si.Projects.Add(pi);
-				}
-				solutions.Add(si);
-			}
-			return solutions;
 		}
 
 		#endregion

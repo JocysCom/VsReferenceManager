@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace JocysCom.VS.ReferenceManager
 {
-	public class ProjectScanner : IProgress<ProgressEventArgs>
+	public class ProjectScanner : IScanner
 	{
 
 		public ProjectScanner()
@@ -36,47 +36,9 @@ namespace JocysCom.VS.ReferenceManager
 		public DateTime DateEnded => _DateEnded;
 		private DateTime _DateEnded;
 
-		public static SettingsData<ProjectFileInfo> CashedData = new SettingsData<ProjectFileInfo>("ProjectsCache.xml", false, "Project scanner cache.", System.Reflection.Assembly.GetExecutingAssembly());
-		private static readonly object FileInfoCacheLock = new object();
-
 		public bool IsStopping { get => ff.IsStopping; set => ff.IsStopping = value; }
 
 		public bool IsPaused { get => ff.IsPaused; set => ff.IsPaused = value; }
-
-		private List<ReferenceItem> GetCachedData(FileInfo fi)
-		{
-			lock (FileInfoCacheLock)
-			{
-				var item = CashedData.Items.FirstOrDefault(x => string.Compare(x.FullName, fi.FullName, true) == 0);
-				// if Found and changed then...
-				if (item != null && (item.Modified != fi.LastWriteTimeUtc || item.Size != fi.Length))
-				{
-					CashedData.Remove(item);
-					item = null;
-				}
-				if (item == null)
-					return null;
-				return item.Data;
-			}
-		}
-
-		private void SetCachedData(FileInfo fi, List<ReferenceItem> data)
-		{
-			lock (FileInfoCacheLock)
-			{
-				var item = CashedData.Items.FirstOrDefault(x => string.Compare(x.FullName, fi.FullName, true) == 0);
-				if (item != null)
-					CashedData.Remove(item);
-				item = new ProjectFileInfo
-				{
-					FullName = fi.FullName,
-					Modified = fi.LastWriteTimeUtc,
-					Size = fi.Length,
-					Data = data,
-				};
-				CashedData.Add(item);
-			}
-		}
 
 		private readonly FileFinder ff;
 

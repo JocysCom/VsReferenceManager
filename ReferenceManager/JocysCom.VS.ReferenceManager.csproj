@@ -48,11 +48,15 @@
   <ItemGroup>
     <Compile Include="Common\AppData.cs" />
     <Compile Include="Common\Global.cs" />
+    <Compile Include="Common\IScanner.cs" />
     <Compile Include="Common\ProjectFileInfo.cs" />
+    <Compile Include="Common\SolutionScanner.cs" />
+    <Compile Include="Controls\SolutionsControl.xaml.cs">
+      <DependentUpon>SolutionsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Info\ProjectInfo.cs" />
     <Compile Include="Info\ProjectOutputType.cs" />
     <Compile Include="Common\ProjectScanner.cs" />
-    <Compile Include="Common\ProjectScannerStatus.cs" />
     <Compile Include="Common\ProjectsControlType.cs" />
     <Compile Include="Common\ProjectUpdater.cs" />
     <Compile Include="Common\ProjectUpdaterParam.cs" />
@@ -66,12 +70,11 @@
     <Compile Include="Controls\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ProjectsListControl.xaml.cs">
-      <DependentUpon>ProjectsListControl.xaml</DependentUpon>
+    <Compile Include="Controls\ReferenceListControl.xaml.cs">
+      <DependentUpon>ReferenceListControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\ItemFormattingConverter.cs" />
     <Compile Include="Info\ConfigInfo.cs" />
-    <Compile Include="Info\SolutionInfo.cs" />
     <Compile Include="JocysCom\ComponentModel\BindingListInvoked.cs" />
     <Compile Include="JocysCom\ComponentModel\PropertyComparer.cs" />
     <Compile Include="JocysCom\ComponentModel\SortableBindingList.cs" />
@@ -187,9 +190,13 @@
     <Page Include="Controls\OptionsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\ProjectsListControl.xaml">
+    <Page Include="Controls\ReferenceListControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\SolutionsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="JocysCom\Controls\InfoControl.xaml">
       <Generator>MSBuild:Compile</Generator>

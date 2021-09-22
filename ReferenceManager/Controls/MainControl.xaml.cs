@@ -172,7 +172,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			{
 				var ri = references[r];
 				// Find project for reference.
-				var refProjects = Global.ReferenceItems.Items.Where(x => x.ProjectAssemblyName == ri.ReferenceName && x.IsProject).ToList();
+				var refProjects = Global.ProjectItems.Items.Where(x => x.ProjectAssemblyName == ri.ReferenceName && x.IsProject).ToList();
 				// Continue if no projects found.
 				if (refProjects.Count == 0)
 					continue;
@@ -249,7 +249,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			return vsProject;
 		}
 
-		void StartUpdater(ProjectsListControl control, IList<ReferenceItem> projectItems, IList<ReferenceItem> referenceItems = null)
+		void StartUpdater(ReferenceListControl control, IList<ReferenceItem> projectItems, IList<ReferenceItem> referenceItems = null)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 			var param = new ProjectUpdaterParam();
@@ -336,7 +336,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			StartUpdater(ReferenceListPanel, projectItems, referenceItems);
 		}
 
-		List<ReferenceItem> GetCheckedOrSelectedReferences(ProjectsListControl control, out bool containsChecked)
+		List<ReferenceItem> GetCheckedOrSelectedReferences(ReferenceListControl control, out bool containsChecked)
 		{
 			var list = control.ReferenceList;
 			containsChecked = list.Any(x => x.IsChecked);
@@ -348,7 +348,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			return references;
 		}
 
-		ProjectsListControl _TaskControl;
+		ReferenceListControl _TaskControl;
 		ProjectUpdater _ProjectUpdater;
 
 		void ProjectUpdateTask(object state)
@@ -384,8 +384,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					break;
 				case ProgressStatus.Completed:
 					_TaskControl.ScanProgressPanel.UpdateProgress();
-					ProjectScanner.CashedData.Save();
-					Global.ReferenceItems.Save();
+					Global.SaveSettings();
 					UpdateSolution();
 					UpdateProjects();
 					UpdateReferences();

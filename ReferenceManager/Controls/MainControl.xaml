@@ -28,8 +28,8 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="60*" />
 		</Grid.RowDefinitions>
-		<controls:ProjectsListControl x:Name="SolutionListPanel" Grid.Row="0" ProjectsControlType="Solution" />
-		<controls:ProjectsListControl x:Name="ProjectListPanel" Grid.Row="1" ProjectsControlType="Projects" />
+		<controls:ReferenceListControl x:Name="SolutionListPanel" Grid.Row="0" ProjectsControlType="Solution" />
+		<controls:ReferenceListControl x:Name="ProjectListPanel" Grid.Row="1" ProjectsControlType="Projects" />
 		<GridSplitter
 			Grid.Row="2"
 			Margin="0,0,0,0"
@@ -54,6 +54,6 @@
 				</ControlTemplate>
 			</GridSplitter.Template>
 		</GridSplitter>
-		<controls:ProjectsListControl x:Name="ReferenceListPanel" Grid.Row="3" ProjectsControlType="References" />
+		<controls:ReferenceListControl x:Name="ReferenceListPanel" Grid.Row="3" ProjectsControlType="References" />
 	</Grid>
 </UserControl>

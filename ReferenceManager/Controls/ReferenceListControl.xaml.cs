@@ -16,9 +16,9 @@ namespace JocysCom.VS.ReferenceManager.Controls
 	/// <summary>
 	/// Interaction logic for ProjectsListControl.xaml
 	/// </summary>
-	public partial class ProjectsListControl : UserControl
+	public partial class ReferenceListControl : UserControl
 	{
-		public ProjectsListControl()
+		public ReferenceListControl()
 		{
 			InitializeComponent();
 			ScanProgressPanel.Visibility = Visibility.Collapsed;
@@ -92,8 +92,11 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					var bnR = $"Update {action} References to Projects";
 					ControlsHelper.SetText(UpdateButtonLabel, bnR);
 					break;
-				case ProjectsControlType.ScanResults:
-					s += "Scan Results";
+				case ProjectsControlType.ProjectScanner:
+					s += "Scan Projects Results";
+					break;
+				case ProjectsControlType.SolutionScanner:
+					s += "Scan Solutions Results";
 					break;
 				default:
 					break;
@@ -174,16 +177,33 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					ShowButtons(UpdateButton, RefreshButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_arrow_fork2];
 					break;
-				case ProjectsControlType.ScanResults:
-					HeadLabel.Content = "Scan Results";
+				case ProjectsControlType.ProjectScanner:
+					_Scanner = new ProjectScanner();
+					_Scanner.Progress += _Scanner_Progress;
+					HeadLabel.Content = "Scan Projects Results";
 					if (!ControlsHelper.IsDesignMode(this))
 					{
-						ReferenceList = Global.ReferenceItems.Items;
+						ReferenceList = Global.ProjectItems.Items;
 						MainDataGrid.ItemsSource = ReferenceList;
 						if (ReferenceList.Count > 0)
 							MainDataGrid.SelectedIndex = 0;
 					}
 					ShowColumns(ProjectNameColumn, ProjectAssemblyNameColumn, ProjectFrameworkVersionColumn, ReferenceNameColumn, ReferencePathColumn);
+					ShowButtons(ScanButton, ExportButton);
+					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_clipboard_checks];
+					break;
+				case ProjectsControlType.SolutionScanner:
+					_Scanner = new SolutionScanner();
+					_Scanner.Progress += _Scanner_Progress;
+					HeadLabel.Content = "Scan Solutions Results";
+					if (!ControlsHelper.IsDesignMode(this))
+					{
+						ReferenceList = Global.SolutionItems.Items;
+						MainDataGrid.ItemsSource = ReferenceList;
+						if (ReferenceList.Count > 0)
+							MainDataGrid.SelectedIndex = 0;
+					}
+					ShowColumns(SolutionNameColumn, SolutionPathColumn);
 					ShowButtons(ScanButton, ExportButton);
 					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_clipboard_checks];
 					break;
@@ -212,7 +232,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 
 		#endregion
 
-		#region ■ Scan
+		#region ■ Scan Projects
 
 		DateTime ScanStarted;
 		object AddAndUpdateLock = new object();
@@ -225,7 +245,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		private void ScanButton_Click(object sender, RoutedEventArgs e)
 		{
 			var form = new MessageBoxWindow();
-			var result = form.ShowDialog("Start folders scan for projects?", "Scan", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+			var result = form.ShowDialog("Start scan?", "Scan", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 			if (result != MessageBoxResult.OK)
 				return;
 			ScanButton.IsEnabled = false;
@@ -241,7 +261,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			}
 		}
 
-		ProjectScanner _Scanner;
+		IScanner _Scanner;
 
 		void ScanTask(object state)
 		{
@@ -264,8 +284,6 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				ScanProgressPanel.Visibility = Visibility.Visible;
 				ScanButton.IsEnabled = false;
 			});
-			_Scanner = new ProjectScanner();
-			_Scanner.Progress += _Scanner_Progress;
 			//var games = SettingsManager.UserGames.Items;
 			//var programs = SettingsManager.Programs.Items;
 			var currentInfo = new List<ProjectFileInfo>();
@@ -281,7 +299,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				);
 				return;
 			}
-			var scanner = (ProjectScanner)sender;
+			var scanner = (IScanner)sender;
 			switch (e.State)
 			{
 				case ProgressStatus.Started:
@@ -290,16 +308,15 @@ namespace JocysCom.VS.ReferenceManager.Controls
 				case ProgressStatus.Updated:
 					lock (AddAndUpdateLock)
 					{
-						if (e.SubData is List<ReferenceItem> ris)
-							foreach (var ri in ris)
-								ReferenceList.Add(ri);
+					if (e.SubData is List<ReferenceItem> ris)
+						foreach (var ri in ris)
+							ReferenceList.Add(ri);
 					}
 					ScanProgressPanel.UpdateProgress(e);
 					break;
 				case ProgressStatus.Completed:
 					ScanProgressPanel.UpdateProgress();
-					ProjectScanner.CashedData.Save();
-					Global.ReferenceItems.Save();
+					Global.SaveSettings();
 					ScanButton.IsEnabled = true;
 					Global.MainWindow.InfoPanel.RemoveTask(TaskName.Scan);
 					break;
