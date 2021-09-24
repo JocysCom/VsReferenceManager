@@ -19,224 +19,190 @@
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</UserControl.Resources>
-	<TabControl
-		x:Name="ResultsTabControl"
-		Grid.Row="1"
-		Grid.Column="0"
-		Grid.ColumnSpan="2"
-		Margin="3,3,3,3"
-		Padding="0,0,0,0"
-		HorizontalAlignment="Stretch">
-		<TabItem x:Name="ResultsTabPage">
-			<TabItem.Header>
-				<StackPanel Orientation="Horizontal">
-					<ContentControl
-						x:Name="TabIconContentControl"
-						Width="12"
-						Height="12"
-						VerticalAlignment="Center"
-						Content="{StaticResource Icon_nav_plain}" />
-					<Label
-						x:Name="HeadLabel"
-						Padding="4,0,0,0"
-						VerticalAlignment="Center"
-						Content="None" />
-				</StackPanel>
-			</TabItem.Header>
-			<Grid VerticalAlignment="Stretch">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="*" />
-					<RowDefinition Height="Auto" />
-				</Grid.RowDefinitions>
-				<ToolBarPanel Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource MainToolBarPanel}">
-					<ToolBar Style="{StaticResource MainToolBar}">
-						<Button
-							Name="ScanButton"
-							HorizontalAlignment="Right"
-							x:FieldModifier="public"
-							Click="ScanButton_Click"
-							Style="{StaticResource ToolBarButton}">
-							<StackPanel Style="{StaticResource ButtonStackPanel}">
-								<ContentControl Content="{StaticResource Icon_magnifying_glass}" Style="{StaticResource ButtonContentControl}" />
-								<Label Content="Scan" Style="{StaticResource ButtonLabel}" />
-							</StackPanel>
-						</Button>
-						<Button
-							Name="UpdateButton"
-							HorizontalAlignment="Right"
-							x:FieldModifier="public"
-							Style="{StaticResource ToolBarButton}">
-							<StackPanel Style="{StaticResource ButtonStackPanel}">
-								<ContentControl Content="{StaticResource Icon_objects_exchange}" Style="{StaticResource ButtonContentControl}" />
-								<Label x:Name="UpdateButtonLabel" Content="Update References" Style="{StaticResource ButtonLabel}" />
-							</StackPanel>
-						</Button>
-						<Button
-							Name="RefreshButton"
-							HorizontalAlignment="Right"
-							x:FieldModifier="public"
-							Style="{StaticResource ToolBarButton}">
-							<StackPanel Style="{StaticResource ButtonStackPanel}">
-								<ContentControl Content="{StaticResource Icon_Refresh}" Style="{StaticResource ButtonContentControl}" />
-								<Label Content="Refresh" Style="{StaticResource ButtonLabel}" />
-							</StackPanel>
-						</Button>
-						<Button
-							Name="ExportButton"
-							HorizontalAlignment="Right"
-							x:FieldModifier="public"
-							Click="ExportButton_Click"
-							Style="{StaticResource ToolBarButton}">
-							<StackPanel Style="{StaticResource ButtonStackPanel}">
-								<ContentControl Content="{StaticResource Icon_Export}" Style="{StaticResource ButtonContentControl}" />
-								<Label Content="Export..." Style="{StaticResource ButtonLabel}" />
-							</StackPanel>
-						</Button>
-					</ToolBar>
-				</ToolBarPanel>
-				<DataGrid
-					x:Name="MainDataGrid"
-					Grid.Row="1"
-					Height="Auto"
-					HorizontalAlignment="Stretch"
-					VerticalAlignment="Stretch"
+	<Grid VerticalAlignment="Stretch">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<ToolBarPanel Grid.Row="0" HorizontalAlignment="Left" Style="{StaticResource MainToolBarPanel}">
+			<ToolBar Style="{StaticResource MainToolBar}">
+				<Label Content="" Name="TitleLabel" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
+			</ToolBar>
+		</ToolBarPanel>
+		<ToolBarPanel Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource MainToolBarPanel}">
+			<ToolBar Style="{StaticResource MainToolBar}">
+				<Button
+					Name="UpdateButton"
+					HorizontalAlignment="Right"
 					x:FieldModifier="public"
-					AutoGenerateColumns="False"
-					Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
-					BorderThickness="0"
-					IsReadOnly="True"
-					ScrollViewer.CanContentScroll="True"
-					ScrollViewer.HorizontalScrollBarVisibility="Visible"
-					ScrollViewer.VerticalScrollBarVisibility="Visible"
-					SelectionChanged="MainDataGrid_SelectionChanged"
-					SelectionMode="Extended">
-					<DataGrid.Resources>
-						<converters:ItemFormattingConverter x:Key="_MainDataGridFormattingConverter" />
-					</DataGrid.Resources>
-					<DataGrid.Columns>
-						<DataGridCheckBoxColumn
-							x:Name="IsEnabledColumn"
-							Width="Auto"
-							Binding="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-							CanUserSort="False"
-							EditingElementStyle="{StaticResource CheckBoxCell}"
-							ElementStyle="{StaticResource CheckBoxCell}"
-							IsThreeState="False" />
-
-
-						<DataGridCheckBoxColumn
-							x:Name="IsCheckedColumn"
-							Width="Auto"
-							Binding="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-							CanUserSort="False"
-							EditingElementStyle="{StaticResource CheckBoxCell}"
-							ElementStyle="{StaticResource CheckBoxCell}">
-							<DataGridCheckBoxColumn.Header>
-								<CheckBox
-									x:Name="IsCheckedColumnCheckBox"
-									Margin="0,0,0,0"
-									Padding="0,0,0,0"
-									IsEnabled="False" />
-							</DataGridCheckBoxColumn.Header>
-						</DataGridCheckBoxColumn>
-						<DataGridTemplateColumn x:Name="StatusCodeColumn" Width="SizeToCells" IsReadOnly="True">
-							<DataGridTemplateColumn.Header>
-								<ContentControl
-									x:Name="StatusCodeColumnContentControl"
-									Width="12"
-									Height="12"
-									VerticalAlignment="Center"
-									Content="{StaticResource Icon_Information_Grey}"
-									IsEnabled="False" />
-							</DataGridTemplateColumn.Header>
-							<DataGridTemplateColumn.CellTemplate>
-								<DataTemplate>
-									<ContentControl Style="{StaticResource ButtonContentControl}">
-										<ContentControl.Content>
-											<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
-												<Binding RelativeSource="{RelativeSource Self}" />
-												<Binding RelativeSource="{RelativeSource TemplatedParent}" />
-												<Binding Path="StatusCode" />
-											</MultiBinding>
-										</ContentControl.Content>
-									</ContentControl>
-								</DataTemplate>
-							</DataGridTemplateColumn.CellTemplate>
-						</DataGridTemplateColumn>
-						<DataGridTextColumn
-							x:Name="StatusTextColumn"
-							Binding="{Binding StatusText}"
-							EditingElementStyle="{StaticResource TextBoxCell}"
-							ElementStyle="{StaticResource TextBlockCell}"
-							Header="Status" />
-						<DataGridTextColumn
-							x:Name="SolutionNameColumn"
-							Binding="{Binding SolutionName}"
-							EditingElementStyle="{StaticResource TextBoxCell}"
-							ElementStyle="{StaticResource TextBlockCell}"
-							Header="Solution Name" />
-						<DataGridTextColumn
-							x:Name="SolutionPathColumn"
-							Width="*"
-							Binding="{Binding SolutionPath}"
-							EditingElementStyle="{StaticResource TextBoxCell}"
-							ElementStyle="{StaticResource TextBlockCell}"
-							Header="Solution Path" />
-						<DataGridTextColumn
-							x:Name="ProjectNameColumn"
-							Binding="{Binding ProjectName}"
-							EditingElementStyle="{StaticResource TextBoxCell}"
-							ElementStyle="{StaticResource TextBlockCell}"
-							Header="Project Name" />
-						<DataGridTextColumn
-							x:Name="ProjectAssemblyNameColumn"
-							Binding="{Binding ProjectAssemblyName}"
-							EditingElementStyle="{StaticResource TextBoxCell}"
-							ElementStyle="{StaticResource TextBlockCell}"
-							Header="Project Assembly Name" />
-						<DataGridTextColumn
-							x:Name="ProjectFrameworkVersionColumn"
-							Binding="{Binding ProjectFrameworkVersion}"
-							EditingElementStyle="{StaticResource TextBoxCell}"
-							ElementStyle="{StaticResource TextBlockCell}"
-							Header="Version" />
-						<DataGridTextColumn
-							x:Name="ProjectPathColumn"
-							Width="*"
-							Binding="{Binding ProjectPath}"
-							EditingElementStyle="{StaticResource TextBoxCell}"
-							ElementStyle="{StaticResource TextBlockCell}"
-							Header="Project Path" />
-						<DataGridTextColumn
-							x:Name="ReferenceNameColumn"
-							Binding="{Binding ReferenceName}"
-							EditingElementStyle="{StaticResource TextBoxCell}"
-							ElementStyle="{StaticResource TextBlockCell}"
-							Header="Reference Name" />
-						<DataGridTextColumn
-							x:Name="ReferencePathColumn"
-							Width="*"
-							EditingElementStyle="{StaticResource TextBoxCell}"
-							ElementStyle="{StaticResource TextBlockCell}"
-							Header="Reference Path">
-							<DataGridTextColumn.Binding>
-								<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
-									<Binding RelativeSource="{RelativeSource Self}" />
-									<Binding RelativeSource="{RelativeSource TemplatedParent}" />
-									<Binding Path="ReferencePath" />
-								</MultiBinding>
-							</DataGridTextColumn.Binding>
-						</DataGridTextColumn>
-					</DataGrid.Columns>
-					<DataGrid.CellStyle>
-						<Style TargetType="DataGridCell">
-							<Setter Property="Padding" Value="4" />
-						</Style>
-					</DataGrid.CellStyle>
-				</DataGrid>
-				<JcControls:ProgressBarControl x:Name="ScanProgressPanel" Grid.Row="2" x:FieldModifier="public" />
-			</Grid>
-		</TabItem>
-	</TabControl>
+					Style="{StaticResource ToolBarButton}">
+					<StackPanel Style="{StaticResource ButtonStackPanel}">
+						<ContentControl Content="{StaticResource Icon_objects_exchange}" Style="{StaticResource ButtonContentControl}" />
+						<Label x:Name="UpdateButtonLabel" Content="Update References" Style="{StaticResource ButtonLabel}" />
+					</StackPanel>
+				</Button>
+				<Button
+					Name="RefreshButton"
+					HorizontalAlignment="Right"
+					x:FieldModifier="public"
+					Style="{StaticResource ToolBarButton}">
+					<StackPanel Style="{StaticResource ButtonStackPanel}">
+						<ContentControl Content="{StaticResource Icon_Refresh}" Style="{StaticResource ButtonContentControl}" />
+						<Label Content="Refresh" Style="{StaticResource ButtonLabel}" />
+					</StackPanel>
+				</Button>
+				<Button
+					Name="ExportButton"
+					HorizontalAlignment="Right"
+					x:FieldModifier="public"
+					Click="ExportButton_Click"
+					Style="{StaticResource ToolBarButton}">
+					<StackPanel Style="{StaticResource ButtonStackPanel}">
+						<ContentControl Content="{StaticResource Icon_Export}" Style="{StaticResource ButtonContentControl}" />
+						<Label Content="Export..." Style="{StaticResource ButtonLabel}" />
+					</StackPanel>
+				</Button>
+			</ToolBar>
+		</ToolBarPanel>
+		<DataGrid
+			x:Name="MainDataGrid"
+			Grid.Row="1"
+			Height="Auto"
+			HorizontalAlignment="Stretch"
+			VerticalAlignment="Stretch"
+			x:FieldModifier="public"
+			AutoGenerateColumns="False"
+			Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+			BorderThickness="0"
+			IsReadOnly="True"
+			ScrollViewer.CanContentScroll="True"
+			ScrollViewer.HorizontalScrollBarVisibility="Auto"
+			ScrollViewer.VerticalScrollBarVisibility="Auto"
+			SelectionChanged="MainDataGrid_SelectionChanged"
+			SelectionMode="Extended">
+			<DataGrid.Resources>
+				<converters:ItemFormattingConverter x:Key="_MainDataGridFormattingConverter" />
+			</DataGrid.Resources>
+			<DataGrid.Columns>
+				<DataGridCheckBoxColumn
+					x:Name="IsEnabledColumn"
+					Width="Auto"
+					Binding="{Binding IsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+					CanUserSort="False"
+					EditingElementStyle="{StaticResource CheckBoxCell}"
+					ElementStyle="{StaticResource CheckBoxCell}"
+					IsThreeState="False" />
+				<DataGridCheckBoxColumn
+					x:Name="IsCheckedColumn"
+					Width="Auto"
+					Binding="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+					CanUserSort="False"
+					EditingElementStyle="{StaticResource CheckBoxCell}"
+					ElementStyle="{StaticResource CheckBoxCell}">
+					<DataGridCheckBoxColumn.Header>
+						<CheckBox
+							x:Name="IsCheckedColumnCheckBox"
+							Margin="0,0,0,0"
+							Padding="0,0,0,0"
+							IsEnabled="False" />
+					</DataGridCheckBoxColumn.Header>
+				</DataGridCheckBoxColumn>
+				<DataGridTemplateColumn x:Name="StatusCodeColumn" Width="SizeToCells" IsReadOnly="True">
+					<DataGridTemplateColumn.Header>
+						<ContentControl
+							x:Name="StatusCodeColumnContentControl"
+							Width="12"
+							Height="12"
+							VerticalAlignment="Center"
+							Content="{StaticResource Icon_Information_Grey}"
+							IsEnabled="False" />
+					</DataGridTemplateColumn.Header>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<ContentControl Style="{StaticResource ButtonContentControl}">
+								<ContentControl.Content>
+									<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+										<Binding RelativeSource="{RelativeSource Self}" />
+										<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+										<Binding Path="StatusCode" />
+									</MultiBinding>
+								</ContentControl.Content>
+							</ContentControl>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTextColumn
+					x:Name="StatusTextColumn"
+					Binding="{Binding StatusText}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Status" />
+				<DataGridTextColumn
+					x:Name="SolutionNameColumn"
+					Binding="{Binding SolutionName}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Solution Name" />
+				<DataGridTextColumn
+					x:Name="SolutionPathColumn"
+					Width="Auto"
+					Binding="{Binding SolutionPath}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Solution Path" />
+				<DataGridTextColumn
+					x:Name="ProjectNameColumn"
+					Binding="{Binding ProjectName}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Project Name" />
+				<DataGridTextColumn
+					x:Name="ProjectAssemblyNameColumn"
+					Binding="{Binding ProjectAssemblyName}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Project Assembly Name" />
+				<DataGridTextColumn
+					x:Name="ProjectFrameworkVersionColumn"
+					Binding="{Binding ProjectFrameworkVersion}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Version" />
+				<DataGridTextColumn
+					x:Name="ProjectPathColumn"
+					Width="Auto"
+					Binding="{Binding ProjectPath}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Project Path" />
+				<DataGridTextColumn
+					x:Name="ReferenceNameColumn"
+					Binding="{Binding ReferenceName}"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Reference Name" />
+				<DataGridTextColumn
+					x:Name="ReferencePathColumn"
+					Width="Auto"
+					EditingElementStyle="{StaticResource TextBoxCell}"
+					ElementStyle="{StaticResource TextBlockCell}"
+					Header="Reference Path">
+					<DataGridTextColumn.Binding>
+						<MultiBinding Converter="{StaticResource _MainDataGridFormattingConverter}">
+							<Binding RelativeSource="{RelativeSource Self}" />
+							<Binding RelativeSource="{RelativeSource TemplatedParent}" />
+							<Binding Path="ReferencePath" />
+						</MultiBinding>
+					</DataGridTextColumn.Binding>
+				</DataGridTextColumn>
+			</DataGrid.Columns>
+			<DataGrid.CellStyle>
+				<Style TargetType="DataGridCell">
+					<Setter Property="Padding" Value="4" />
+				</Style>
+			</DataGrid.CellStyle>
+		</DataGrid>
+		<JcControls:ProgressBarControl x:Name="ScanProgressPanel" Grid.Row="2" x:FieldModifier="public" />
+	</Grid>
 </UserControl>

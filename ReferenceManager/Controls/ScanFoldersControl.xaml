@@ -1,0 +1,178 @@
+﻿<UserControl
+	x:Class="JocysCom.VS.ReferenceManager.Controls.ScanFoldersControl"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:JcControls="clr-namespace:JocysCom.ClassLibrary.Controls"
+	xmlns:controls="clr-namespace:JocysCom.VS.ReferenceManager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	Name="MyToolWindow"
+	d:DesignHeight="300"
+	d:DesignWidth="500"
+	Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+	mc:Ignorable="d">
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="../JocysCom/Controls/Themes/Default.xaml" />
+				<ResourceDictionary Source="../JocysCom/Controls/Themes/Icons.xaml" />
+				<ResourceDictionary Source="../Resources/Icons/Icons_Default.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="70*" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition />
+				<ColumnDefinition />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<ToolBarPanel Grid.Row="0" HorizontalAlignment="Left" Style="{StaticResource MainToolBarPanel}">
+				<ToolBar Style="{StaticResource MainToolBar}">
+					<Label Name="FolderHeadLabel" Content="Folders" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
+				</ToolBar>
+			</ToolBarPanel>
+			<ToolBarPanel
+				Grid.Row="0"
+				Grid.Column="1"
+				HorizontalAlignment="Right"
+				Style="{StaticResource MainToolBarPanel}">
+				<ToolBar Style="{StaticResource MainToolBar}">
+					<Button
+						Name="LocationAddButton"
+						HorizontalAlignment="Right"
+						Click="LocationAddButton_Click"
+						Style="{StaticResource ToolBarButton}">
+						<StackPanel Style="{StaticResource ButtonStackPanel}">
+							<ContentControl Content="{StaticResource Icon_Add}" Style="{StaticResource ButtonContentControl}" />
+							<Label Content="Add..." Style="{StaticResource ButtonLabel}" />
+						</StackPanel>
+					</Button>
+					<Button
+						Name="LocationRemoveButton"
+						HorizontalAlignment="Right"
+						Click="LocationRemoveButton_Click"
+						Style="{StaticResource ToolBarButton}">
+						<StackPanel Style="{StaticResource ButtonStackPanel}">
+							<ContentControl Content="{StaticResource Icon_Remove}" Style="{StaticResource ButtonContentControl}" />
+							<Label Content="Remove" Style="{StaticResource ButtonLabel}" />
+						</StackPanel>
+					</Button>
+					<Button
+						Name="LocationRefreshButton"
+						HorizontalAlignment="Right"
+						Click="LocationRefreshButton_Click"
+						Style="{StaticResource ToolBarButton}"
+						Visibility="Collapsed">
+						<StackPanel Style="{StaticResource ButtonStackPanel}">
+							<ContentControl Content="{StaticResource Icon_Refresh}" Style="{StaticResource ButtonContentControl}" />
+							<Label Content="Refresh" Style="{StaticResource ButtonLabel}" />
+						</StackPanel>
+					</Button>
+					<Button
+						Name="ScanButton"
+						HorizontalAlignment="Right"
+						x:FieldModifier="public"
+						Click="ScanButton_Click"
+						Style="{StaticResource ToolBarButton}">
+						<StackPanel Style="{StaticResource ButtonStackPanel}">
+							<ContentControl Content="{StaticResource Icon_magnifying_glass}" Style="{StaticResource ButtonContentControl}" />
+							<Label Content="Scan" FontWeight="Bold" Style="{StaticResource ButtonLabel}" />
+						</StackPanel>
+					</Button>
+				</ToolBar>
+			</ToolBarPanel>
+			<Border
+				Grid.Row="1"
+				Grid.ColumnSpan="2"
+				Height="1"
+				BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"
+				BorderThickness="1"
+				SnapsToDevicePixels="True" />
+			<ListBox
+				Name="ScanLocationsListBox"
+				Grid.Row="1"
+				Grid.ColumnSpan="2"
+				MinHeight="32"
+				HorizontalAlignment="Stretch"
+				VerticalAlignment="Stretch"
+				BorderThickness="0"
+				SelectionChanged="ScanLocationsListBox_SelectionChanged" />
+		</Grid>
+		<GridSplitter Grid.Row="1" Style="{StaticResource GridSplitterHorizontal}" />
+		<TabControl
+			x:Name="ResultsTabControl"
+			Grid.Row="2"
+			Grid.Column="0"
+			Grid.ColumnSpan="2"
+			Margin="3,3,3,3"
+			Padding="0,0,0,0"
+			HorizontalAlignment="Stretch">
+			<TabItem x:Name="SolutionsTabPage">
+				<TabItem.Header>
+					<StackPanel Orientation="Horizontal">
+						<ContentControl
+							x:Name="SolutionsIconControl"
+							Width="12"
+							Height="12"
+							VerticalAlignment="Center"
+							Content="{StaticResource Icon_Visual_Studio}" />
+						<Label
+							x:Name="SolutionsHeadLabel"
+							Padding="4,0,0,0"
+							VerticalAlignment="Center"
+							Content="Solutions" />
+					</StackPanel>
+				</TabItem.Header>
+				<controls:ReferenceListControl x:Name="SolutionItemsPanel" ProjectsControlType="SolutionItems" />
+			</TabItem>
+			<TabItem x:Name="ProjectsTabPage">
+				<TabItem.Header>
+					<StackPanel Orientation="Horizontal">
+						<ContentControl
+							x:Name="ProjectsIconControl"
+							Width="12"
+							Height="12"
+							VerticalAlignment="Center"
+							Content="{StaticResource Icon_windows}" />
+						<Label
+							x:Name="ProjectsHeadLabel"
+							Padding="4,0,0,0"
+							VerticalAlignment="Center"
+							Content="Projects" />
+					</StackPanel>
+				</TabItem.Header>
+				<controls:ReferenceListControl x:Name="ProjectItemsPanel" ProjectsControlType="ProjectItems" />
+			</TabItem>
+			<TabItem x:Name="ReferencesTabPage">
+				<TabItem.Header>
+					<StackPanel Orientation="Horizontal">
+						<ContentControl
+							x:Name="ReferencesIconControl"
+							Width="12"
+							Height="12"
+							VerticalAlignment="Center"
+							Content="{StaticResource Icon_elements_tree}" />
+						<Label
+							x:Name="ReferencesHeadLabel"
+							Padding="4,0,0,0"
+							VerticalAlignment="Center"
+							Content="References" />
+					</StackPanel>
+				</TabItem.Header>
+				<controls:ReferenceListControl x:Name="ReferenceItemsPanel" ProjectsControlType="ReferenceItems" />
+			</TabItem>
+
+		</TabControl>
+		<JcControls:ProgressBarControl x:Name="ScanProgressPanel" Grid.Row="3" x:FieldModifier="public" />
+	</Grid>
+</UserControl>

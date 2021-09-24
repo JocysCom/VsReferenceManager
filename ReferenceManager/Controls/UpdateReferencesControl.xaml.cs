@@ -12,9 +12,9 @@ namespace JocysCom.VS.ReferenceManager.Controls
 	/// <summary>
 	/// Interaction logic for MainControl.xaml
 	/// </summary>
-	public partial class MainControl : UserControl
+	public partial class UpdateReferencesControl : UserControl
 	{
-		public MainControl()
+		public UpdateReferencesControl()
 		{
 			InitializeComponent();
 			SolutionListPanel.RefreshButton.Click += SolutionListPanel_RefreshButton_Click;
@@ -27,6 +27,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			// Trigger references update.
 			ReferenceListPanel.RefreshButton.Click += ReferenceListPanel_RefreshButton_Click;
 			ReferenceListPanel.UpdateButton.Click += ReferenceListPanel_UpdateButton_Click;
+			// Update References on load.
+			UpdateReferences();
 		}
 
 		public SortableBindingList<ReferenceItem> SolutionList
@@ -172,7 +174,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			{
 				var ri = references[r];
 				// Find project for reference.
-				var refProjects = Global.ProjectItems.Items.Where(x => x.ProjectAssemblyName == ri.ReferenceName && x.IsProject).ToList();
+				var refProjects = Global.ProjectItems.Items.Where(x => x.ProjectAssemblyName == ri.ReferenceName).ToList();
 				// Continue if no projects found.
 				if (refProjects.Count == 0)
 					continue;

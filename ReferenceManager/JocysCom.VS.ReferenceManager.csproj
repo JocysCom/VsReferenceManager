@@ -47,16 +47,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Common\AppData.cs" />
+    <Compile Include="Common\AppHelper.cs" />
     <Compile Include="Common\Global.cs" />
     <Compile Include="Common\IScanner.cs" />
+    <Compile Include="Common\ItemType.cs" />
     <Compile Include="Common\ProjectFileInfo.cs" />
-    <Compile Include="Common\SolutionScanner.cs" />
-    <Compile Include="Controls\SolutionsControl.xaml.cs">
-      <DependentUpon>SolutionsControl.xaml</DependentUpon>
+    <Compile Include="Controls\CheckIssuesControl.xaml.cs">
+      <DependentUpon>CheckIssuesControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\OptionsControl.xaml.cs">
+      <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Info\ProjectInfo.cs" />
     <Compile Include="Info\ProjectOutputType.cs" />
-    <Compile Include="Common\ProjectScanner.cs" />
+    <Compile Include="Common\LocationsScanner.cs" />
     <Compile Include="Common\ProjectsControlType.cs" />
     <Compile Include="Common\ProjectUpdater.cs" />
     <Compile Include="Common\ProjectUpdaterParam.cs" />
@@ -64,11 +68,11 @@
     <Compile Include="Common\SolutionHelper.cs" />
     <Compile Include="Info\InfoHelper.cs" />
     <Compile Include="Common\TaskName.cs" />
-    <Compile Include="Controls\MainControl.xaml.cs">
-      <DependentUpon>MainControl.xaml</DependentUpon>
+    <Compile Include="Controls\UpdateReferencesControl.xaml.cs">
+      <DependentUpon>UpdateReferencesControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\OptionsControl.xaml.cs">
-      <DependentUpon>OptionsControl.xaml</DependentUpon>
+    <Compile Include="Controls\ScanFoldersControl.xaml.cs">
+      <DependentUpon>ScanFoldersControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ReferenceListControl.xaml.cs">
       <DependentUpon>ReferenceListControl.xaml</DependentUpon>
@@ -87,6 +91,10 @@
     <Compile Include="JocysCom\Controls\InfoControl.xaml.cs">
       <DependentUpon>InfoControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="JocysCom\Controls\IssuesControl\IssueItem.cs" />
+    <Compile Include="JocysCom\Controls\IssuesControl\IssueSeverity.cs" />
+    <Compile Include="JocysCom\Controls\IssuesControl\IssueStatus.cs" />
+    <Compile Include="JocysCom\Controls\IssuesControl\SeverityToImageConverter.cs" />
     <Compile Include="JocysCom\Controls\MessageBoxWindow.xaml.cs">
       <DependentUpon>MessageBoxWindow.xaml</DependentUpon>
     </Compile>
@@ -183,18 +191,23 @@
     <Content Include="Resources\MainWindowCommand.png" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Controls\MainControl.xaml">
+    <Page Include="Controls\UpdateReferencesControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\OptionsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ScanFoldersControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\ReferenceListControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\SolutionsControl.xaml">
+    <Page Include="Controls\CheckIssuesControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -1,6 +1,6 @@
-﻿using JocysCom.ClassLibrary.Configuration;
-using JocysCom.ClassLibrary.Controls;
+﻿using JocysCom.ClassLibrary.Controls;
 using JocysCom.ClassLibrary.IO;
+using JocysCom.VS.ReferenceManager.Info;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,10 +9,10 @@ using System.Xml.Linq;
 
 namespace JocysCom.VS.ReferenceManager
 {
-	public class ProjectScanner : IScanner
+	public class LocationsScanner : IScanner
 	{
 
-		public ProjectScanner()
+		public LocationsScanner()
 		{
 			ff = new FileFinder();
 			ff.FileFound += ff_FileFound;
@@ -53,7 +53,6 @@ namespace JocysCom.VS.ReferenceManager
 				State = ProgressStatus.Started
 			};
 			Report(e);
-			var skipped = 0;
 			var added = 0;
 			var updated = 0;
 			var winFolder = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
@@ -65,7 +64,7 @@ namespace JocysCom.VS.ReferenceManager
 			// Create list to store file to scan.
 			var files = string.IsNullOrEmpty(fileName)
 				// Scan all files.
-				? ff.GetFiles("*.csproj;*.vbproj", true, dirs)
+				? ff.GetFiles("*.csproj;*.vbproj;*.sln", true, dirs)
 				// Scan specific file.
 				: ff.GetFiles(fileName, false, dirs);
 			// Step 2: Scan files.
@@ -75,21 +74,23 @@ namespace JocysCom.VS.ReferenceManager
 				// If file doesn't exist in the game list then continue.
 				e = new ProgressEventArgs
 				{
-					TopMessage = $"Scan Files. Added = {added}, Skipped = {skipped}, Updated = {updated}",
+					TopMessage = $"Scan Files. Added = {added}, Updated = {updated}",
 					TopIndex = i,
 					TopCount = files.Count,
 					TopData = files,
 					SubIndex = 0,
 					SubCount = 0,
 				};
-				var size = file.Length / 1024;
+				var size = FileFinder.BytesToString(file.Length);
 				var name = file.FullName;
-				e.SubMessage = $"Current File: {name}";
+				e.SubMessage = $"File: {name} ({size})";
 				Report(e);
 				// Get info by full name.
 				var info = currentInfo.FirstOrDefault(x => x.FullName.ToLower() == fileName);
-				var data = FromDisk(file.FullName);
-				e.SubData = data;
+				var isSolution = file.Extension.Equals(".sln", StringComparison.InvariantCultureIgnoreCase);
+				e.SubData = isSolution
+					? ParseSolutionFile(file.FullName)
+					: ParseProjectFile(file.FullName);
 				// If file doesn't exist current list then...
 				if (info == null)
 				{
@@ -117,7 +118,7 @@ namespace JocysCom.VS.ReferenceManager
 		/// <param name="fileName">File name to check.</param>
 		/// <param name="searchOption">If not specified then check specified file only.</param>
 		/// <returns></returns>
-		public List<ReferenceItem> FromDisk(string fileName)
+		public List<ReferenceItem> ParseProjectFile(string fileName)
 		{
 			var data = new List<ReferenceItem>();
 			var projectNode = XElement.Load(fileName);
@@ -150,6 +151,7 @@ namespace JocysCom.VS.ReferenceManager
 				});
 			// Add project without references.
 			var projectItem = getNewItem(null, null, null);
+			projectItem.ItemType = ItemType.Project;
 			data.Add(projectItem);
 			for (int i = 0; i < referenceNodes.Count(); i++)
 			{
@@ -162,7 +164,10 @@ namespace JocysCom.VS.ReferenceManager
 				var item = getNewItem(name, path, null);
 				// If reference have path then...
 				if (!string.IsNullOrEmpty(path))
+				{
+					item.ItemType = ItemType.Reference;
 					data.Add(item);
+				}
 			}
 			for (int i = 0; i < projectReferenceNodes.Count(); i++)
 			{
@@ -177,11 +182,59 @@ namespace JocysCom.VS.ReferenceManager
 				var item = getNewItem(name, path, proj);
 				// If reference have path then...
 				if (!string.IsNullOrEmpty(path))
+				{
+					item.ItemType = ItemType.Reference;
 					data.Add(item);
+				}
 			}
 			// Fill data here.
 			return data;
 		}
+
+		/// <summary>
+		/// Get all solutions with list of all projects in them.
+		/// </summary>
+		/// <param name="dir">Root folder to search for solutions.</param>
+		public List<ReferenceItem> ParseSolutionFile(string fileName)
+		{
+			var ri = new ReferenceItem();
+			ri.SolutionName = System.IO.Path.GetFileNameWithoutExtension(fileName);
+			ri.SolutionPath = fileName;
+			ri.ItemType = ItemType.Solution;
+			var solution = Microsoft.Build.Construction.SolutionFile.Parse(ri.SolutionPath);
+			var solutionProjects = solution.ProjectsInOrder;
+			for (int p = 0; p < solutionProjects.Count; p++)
+			{
+				var solutionProject = solutionProjects[p];
+				var fullName = Path.Combine(ri.SolutionPath, solutionProject.RelativePath);
+				// Fix dot notations.
+				fullName = Path.GetFullPath(fullName);
+				if (ri.Projects.Any(x => x.File.FullName == fullName))
+					continue;
+				var pi = new ProjectInfo();
+				pi.File = new FileInfo(fullName);
+				// if this is folder then...
+				if (pi.File.Attributes.HasFlag(FileAttributes.Directory))
+				{
+					var newPath = Path.Combine(pi.File.Directory.FullName, "website.publishproj");
+					pi.File = new FileInfo(newPath);
+				}
+				// Skip if project exists.
+				if (!pi.File.Exists)
+					continue;
+				pi.ProjectName = solutionProject.ProjectName;
+				pi.RelativePath = solutionProject.RelativePath;
+				pi.ProjectGuid = solutionProject.ProjectGuid;
+				pi.ProjectType = solutionProject.ProjectType;
+				pi.OutputType = InfoHelper.GetOutputType(pi.File.FullName, solutionProject.ProjectName);
+				pi.AssemblyName = InfoHelper.GetElementInnerText(pi.File.FullName, "AssemblyName");
+				ri.Projects.Add(pi);
+			}
+			// Fill data here.
+			return new List<ReferenceItem>() { ri };
+		}
+
+
 
 	}
 }

@@ -54,9 +54,10 @@ namespace JocysCom.VS.ReferenceManager
 		public bool IsEnabled { get => _IsEnabled; set => SetProperty(ref _IsEnabled, value); }
 		bool _IsEnabled;
 
-		public bool IsProject =>
-			!string.IsNullOrEmpty(ProjectName) && string.IsNullOrEmpty(ReferenceName);
-		public bool IsReference =>
+		public ItemType ItemType { get => _ItemType; set => SetProperty(ref _ItemType, value); }
+		ItemType _ItemType;
+
+	public bool IsReference =>
 			string.IsNullOrEmpty(ProjectName) && !string.IsNullOrEmpty(ReferenceName);
 
 		[XmlIgnore]

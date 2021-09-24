@@ -6,7 +6,8 @@
 		Solution,
 		Projects,
 		References,
-		ProjectScanner,
-		SolutionScanner,
+		ReferenceItems,
+		SolutionItems,
+		ProjectItems,
 	}
 }

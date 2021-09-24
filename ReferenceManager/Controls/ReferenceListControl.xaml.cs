@@ -74,10 +74,10 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			switch (ProjectsControlType)
 			{
 				case ProjectsControlType.Solution:
-					s += "Solution";
+					s = "Solution";
 					break;
 				case ProjectsControlType.Projects:
-					s += "Projects";
+					s = "Project";
 					updatable = list.Count(x => x.StatusCode == MessageBoxImage.Information);
 					var containsCheckedP = list.Any(x => x.IsChecked);
 					var actionP = containsCheckedP ? "Checked" : "Selected";
@@ -85,27 +85,24 @@ namespace JocysCom.VS.ReferenceManager.Controls
 					ControlsHelper.SetText(UpdateButtonLabel, bnP);
 					break;
 				case ProjectsControlType.References:
-					s += "References";
+					s = "Reference";
 					updatable = list.Count(x => x.StatusCode == MessageBoxImage.Information);
 					var containsCheckedR = list.Any(x => x.IsChecked);
 					var action = containsCheckedR ? "Checked" : "Selected";
 					var bnR = $"Update {action} References to Projects";
 					ControlsHelper.SetText(UpdateButtonLabel, bnR);
 					break;
-				case ProjectsControlType.ProjectScanner:
-					s += "Scan Projects Results";
+				case ProjectsControlType.ReferenceItems:
 					break;
-				case ProjectsControlType.SolutionScanner:
-					s += "Scan Solutions Results";
+				case ProjectsControlType.SolutionItems:
 					break;
 				default:
 					break;
 			}
-			if (count > 0)
-				s += $" ({count})";
-			if (updatable > 0)
-				s += $" Updatable ({updatable})";
-			ControlsHelper.SetText(HeadLabel, s);
+			if (!string.IsNullOrEmpty(s))
+			{
+				AppHelper.SetText(TitleLabel, s, count, updatable);
+			}
 		}
 
 		object _MainDataGridFormattingConverter_Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -159,53 +156,41 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			switch (ProjectsControlType)
 			{
 				case ProjectsControlType.Solution:
-					HeadLabel.Content = "Solution";
+					//HeadLabel.Content = "Solution";
 					ShowColumns(SolutionNameColumn, SolutionPathColumn);
 					ShowButtons(UpdateButton, RefreshButton);
-					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_Visual_Studio];
+					//TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_Visual_Studio];
 					break;
 				case ProjectsControlType.Projects:
-					HeadLabel.Content = "Projects";
+					//HeadLabel.Content = "Projects";
 					ShowColumns(IsCheckedColumn, StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ProjectPathColumn);
 					ShowButtons(UpdateButton, RefreshButton);
-					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_windows];
+					//TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_windows];
 					break;
 				case ProjectsControlType.References:
-					HeadLabel.Content = "References";
+					//HeadLabel.Content = "References";
 					UpdateButtonLabel.Content = "Update Selected References to Projects";
 					ShowColumns(IsCheckedColumn, StatusCodeColumn, StatusTextColumn, ProjectNameColumn, ReferenceNameColumn, ReferencePathColumn);
 					ShowButtons(UpdateButton, RefreshButton);
-					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_arrow_fork2];
+					//TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_arrow_fork2];
 					break;
-				case ProjectsControlType.ProjectScanner:
-					_Scanner = new ProjectScanner();
-					_Scanner.Progress += _Scanner_Progress;
-					HeadLabel.Content = "Scan Projects Results";
-					if (!ControlsHelper.IsDesignMode(this))
-					{
-						ReferenceList = Global.ProjectItems.Items;
-						MainDataGrid.ItemsSource = ReferenceList;
-						if (ReferenceList.Count > 0)
-							MainDataGrid.SelectedIndex = 0;
-					}
-					ShowColumns(ProjectNameColumn, ProjectAssemblyNameColumn, ProjectFrameworkVersionColumn, ReferenceNameColumn, ReferencePathColumn);
-					ShowButtons(ScanButton, ExportButton);
-					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_clipboard_checks];
-					break;
-				case ProjectsControlType.SolutionScanner:
-					_Scanner = new SolutionScanner();
-					_Scanner.Progress += _Scanner_Progress;
-					HeadLabel.Content = "Scan Solutions Results";
-					if (!ControlsHelper.IsDesignMode(this))
-					{
-						ReferenceList = Global.SolutionItems.Items;
-						MainDataGrid.ItemsSource = ReferenceList;
-						if (ReferenceList.Count > 0)
-							MainDataGrid.SelectedIndex = 0;
-					}
+				case ProjectsControlType.SolutionItems:
+					InitControlByType(Global.SolutionItems.Items);
+					ShowButtons(ExportButton);
 					ShowColumns(SolutionNameColumn, SolutionPathColumn);
-					ShowButtons(ScanButton, ExportButton);
-					TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_clipboard_checks];
+					//TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_clipboard_checks];
+					break;
+				case ProjectsControlType.ProjectItems:
+					InitControlByType(Global.ProjectItems.Items);
+					ShowColumns(ProjectNameColumn, ProjectAssemblyNameColumn, ProjectFrameworkVersionColumn, ProjectPathColumn);
+					ShowButtons(ExportButton);
+					//TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_clipboard_checks];
+					break;
+				case ProjectsControlType.ReferenceItems:
+					InitControlByType(Global.ReferenceItems.Items);
+					ShowColumns(ProjectNameColumn, ReferenceNameColumn, ReferencePathColumn);
+					ShowButtons(ExportButton);
+					//TabIconContentControl.Content = Icons_Default.Current[Icons_Default.Icon_clipboard_checks];
 					break;
 				default:
 					break;
@@ -214,6 +199,18 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			ReferenceList.ListChanged -= ReferenceList_ListChanged;
 			ReferenceList.ListChanged += ReferenceList_ListChanged;
 			UpdateControlsFromList();
+		}
+
+		void InitControlByType(SortableBindingList<ReferenceItem> items)
+		{
+			//HeadLabel.Content = $"{ProjectsControlType}".Replace("Item", "");
+			if (!ControlsHelper.IsDesignMode(this))
+			{
+				ReferenceList = items;
+				MainDataGrid.ItemsSource = ReferenceList;
+				if (ReferenceList.Count > 0)
+					MainDataGrid.SelectedIndex = 0;
+			}
 		}
 
 		public void ShowColumns(params DataGridColumn[] args)
@@ -225,104 +222,9 @@ namespace JocysCom.VS.ReferenceManager.Controls
 
 		public void ShowButtons(params Button[] args)
 		{
-			var all = new Button[] { UpdateButton, RefreshButton, ScanButton, ExportButton };
+			var all = new Button[] { UpdateButton, RefreshButton, ExportButton };
 			foreach (var control in all)
 				control.Visibility = args.Contains(control) ? Visibility.Visible : Visibility.Collapsed;
-		}
-
-		#endregion
-
-		#region ■ Scan Projects
-
-		DateTime ScanStarted;
-		object AddAndUpdateLock = new object();
-
-		/// <summary>
-		/// Scan for games
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void ScanButton_Click(object sender, RoutedEventArgs e)
-		{
-			var form = new MessageBoxWindow();
-			var result = form.ShowDialog("Start scan?", "Scan", MessageBoxButton.OKCancel, MessageBoxImage.Question);
-			if (result != MessageBoxResult.OK)
-				return;
-			ScanButton.IsEnabled = false;
-			Global.MainWindow.InfoPanel.AddTask(TaskName.Scan);
-			ScanStarted = DateTime.Now;
-			ReferenceList.Clear();
-			var success = System.Threading.ThreadPool.QueueUserWorkItem(ScanTask);
-			if (!success)
-			{
-				ScanProgressPanel.UpdateProgress("Scan failed!", "", true);
-				ScanButton.IsEnabled = true;
-				Global.MainWindow.InfoPanel.RemoveTask(TaskName.Scan);
-			}
-		}
-
-		IScanner _Scanner;
-
-		void ScanTask(object state)
-		{
-			var scanPath = state as string;
-			string[] paths;
-			string name = null;
-			if (string.IsNullOrEmpty(scanPath))
-			{
-				paths = Global.AppSettings.ScanLocations.ToArray();
-			}
-			else
-			{
-				// Set properties to scan single file.
-				paths = new string[] { System.IO.Path.GetDirectoryName(scanPath) };
-				name = System.IO.Path.GetFileName(scanPath);
-			}
-			ControlsHelper.Invoke(() =>
-			{
-				ScanProgressPanel.UpdateProgress("...", "");
-				ScanProgressPanel.Visibility = Visibility.Visible;
-				ScanButton.IsEnabled = false;
-			});
-			//var games = SettingsManager.UserGames.Items;
-			//var programs = SettingsManager.Programs.Items;
-			var currentInfo = new List<ProjectFileInfo>();
-			_Scanner.Scan(paths, currentInfo, name);
-		}
-
-		private void _Scanner_Progress(object sender, ProgressEventArgs e)
-		{
-			if (ControlsHelper.InvokeRequired)
-			{
-				ControlsHelper.Invoke(() =>
-					_Scanner_Progress(sender, e)
-				);
-				return;
-			}
-			var scanner = (IScanner)sender;
-			switch (e.State)
-			{
-				case ProgressStatus.Started:
-					ScanProgressPanel.UpdateProgress("Started...", "");
-					break;
-				case ProgressStatus.Updated:
-					lock (AddAndUpdateLock)
-					{
-					if (e.SubData is List<ReferenceItem> ris)
-						foreach (var ri in ris)
-							ReferenceList.Add(ri);
-					}
-					ScanProgressPanel.UpdateProgress(e);
-					break;
-				case ProgressStatus.Completed:
-					ScanProgressPanel.UpdateProgress();
-					Global.SaveSettings();
-					ScanButton.IsEnabled = true;
-					Global.MainWindow.InfoPanel.RemoveTask(TaskName.Scan);
-					break;
-				default:
-					break;
-			}
 		}
 
 		#endregion
@@ -336,7 +238,8 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			dialog.Filter = "Data (*.csv)|*.csv|All files (*.*)|*.*";
 			dialog.FilterIndex = 1;
 			dialog.RestoreDirectory = true;
-			if (string.IsNullOrEmpty(dialog.FileName)) dialog.FileName = "Projects_Data";
+			if (string.IsNullOrEmpty(dialog.FileName))
+				dialog.FileName = $"{ProjectsControlType}";
 			//if (string.IsNullOrEmpty(dialog.InitialDirectory)) dialog.InitialDirectory = ;
 			dialog.Title = "Export Data File";
 			var result = dialog.ShowDialog();

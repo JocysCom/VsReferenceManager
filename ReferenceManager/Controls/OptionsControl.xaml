@@ -27,92 +27,25 @@
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="Auto" />
 		</Grid.ColumnDefinitions>
-		<TabControl
-			x:Name="MainTabControl"
+		<Label Grid.Row="0" Grid.Column="0" Content="Settings Folder" />
+		<TextBox
+			Name="SettingsFolderTextBox"
 			Grid.Row="0"
-			Grid.Column="0"
-			Grid.ColumnSpan="2"
-			Margin="3,3,3,3"
-			Padding="0,0,0,0"
-			HorizontalAlignment="Stretch">
-			<TabItem x:Name="SettingsTabPage">
-				<TabItem.Header>
-					<StackPanel Orientation="Horizontal">
-						<ContentControl
-							Width="12"
-							Height="12"
-							VerticalAlignment="Center"
-							Content="{StaticResource Icon_folders}" />
-						<Label
-							x:Name="HeadLabel"
-							Padding="4,0,0,0"
-							VerticalAlignment="Center"
-							Content="Scan Locations" />
-					</StackPanel>
-				</TabItem.Header>
-				<StackPanel>
-					<Grid VerticalAlignment="Stretch">
-						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto" />
-							<RowDefinition Height="*" />
-						</Grid.RowDefinitions>
-						<ToolBarPanel Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource MainToolBarPanel}">
-							<ToolBar Style="{StaticResource MainToolBar}">
-								<Button
-									Name="LocationAddButton"
-									HorizontalAlignment="Right"
-									Click="LocationAddButton_Click"
-									Style="{StaticResource ToolBarButton}">
-									<StackPanel Style="{StaticResource ButtonStackPanel}">
-										<ContentControl Content="{StaticResource Icon_Add}" Style="{StaticResource ButtonContentControl}" />
-										<Label Content="Add..." Style="{StaticResource ButtonLabel}" />
-									</StackPanel>
-								</Button>
-								<Button
-									Name="LocationRemoveButton"
-									HorizontalAlignment="Right"
-									Click="LocationRemoveButton_Click"
-									Style="{StaticResource ToolBarButton}">
-									<StackPanel Style="{StaticResource ButtonStackPanel}">
-										<ContentControl Content="{StaticResource Icon_Remove}" Style="{StaticResource ButtonContentControl}" />
-										<Label Content="Remove" Style="{StaticResource ButtonLabel}" />
-									</StackPanel>
-								</Button>
-								<Button
-									Name="LocationRefreshButton"
-									HorizontalAlignment="Right"
-									Click="LocationRefreshButton_Click"
-									Style="{StaticResource ToolBarButton}">
-									<StackPanel Style="{StaticResource ButtonStackPanel}">
-										<ContentControl Content="{StaticResource Icon_Refresh}" Style="{StaticResource ButtonContentControl}" />
-										<Label Content="Refresh" Style="{StaticResource ButtonLabel}" />
-									</StackPanel>
-								</Button>
-							</ToolBar>
-						</ToolBarPanel>
-						<Border
-							Grid.Row="1"
-							Height="1"
-							BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"
-							BorderThickness="1"
-							SnapsToDevicePixels="True" />
-						<ListBox
-							Name="ScanLocationsListBox"
-							Grid.Row="1"
-							Height="64"
-							HorizontalAlignment="Stretch"
-							BorderThickness="0"
-							SelectionChanged="ScanLocationsListBox_SelectionChanged" />
-					</Grid>
-				</StackPanel>
-			</TabItem>
-		</TabControl>
-		<controls:ReferenceListControl
-			x:Name="ProjectsListPanel"
-			Grid.Row="1"
-			Grid.Column="0"
-			Grid.ColumnSpan="2"
-			ProjectsControlType="ProjectScanner" />
+			Grid.Column="1"
+			IsReadOnly="True" />
+		<Button
+			Name="OpenButton"
+			Grid.Row="0"
+			Grid.Column="2"
+			VerticalAlignment="Center"
+			Click="OpenButton_Click"
+			Style="{StaticResource ToolBarButton}">
+			<StackPanel Style="{StaticResource ButtonStackPanel}">
+				<ContentControl Content="{StaticResource Icon_FolderOpen}" Style="{StaticResource ButtonContentControl}" />
+				<Label Content="Open..." Style="{StaticResource ButtonLabel}" />
+			</StackPanel>
+		</Button>
 	</Grid>
 </UserControl>

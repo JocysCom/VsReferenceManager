@@ -10,6 +10,7 @@
 	d:DesignHeight="400"
 	d:DesignWidth="720"
 	Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+	Loaded="MainWindowPanel_Loaded"
 	Unloaded="MainWindowPanel_Unloaded"
 	mc:Ignorable="d">
 	<UserControl.Resources>
@@ -35,37 +36,55 @@
 							Width="12"
 							Height="12"
 							VerticalAlignment="Center"
+							Content="{StaticResource Icon_magnifying_glass}" />
+						<Label Padding="4,0,0,0" VerticalAlignment="Center" Content="Step 1 - Scan Folders" />
+					</StackPanel>
+				</TabItem.Header>
+				<controls:ScanFoldersControl x:Name="ScanFoldersPanel" />
+			</TabItem>
+			<TabItem>
+				<TabItem.Header>
+					<StackPanel Orientation="Horizontal">
+						<ContentControl
+							Width="12"
+							Height="12"
+							VerticalAlignment="Center"
+							Content="{StaticResource Icon_ProcessLeft}" />
+						<Label Padding="4,0,0,0" VerticalAlignment="Center" Content="Step 2 - Update References" />
+					</StackPanel>
+				</TabItem.Header>
+				<controls:UpdateReferencesControl x:Name="UpdateReferencesPanel" />
+			</TabItem>
+			<TabItem>
+				<TabItem.Header>
+					<StackPanel Orientation="Horizontal">
+						<ContentControl
+							Name="IssueIconContent"
+							Width="12"
+							Height="12"
+							VerticalAlignment="Center"
+							Content="{StaticResource Icon_OK}" />
+						<Label
+							Name="IssueHeadLabel"
+							Padding="4,0,0,0"
+							VerticalAlignment="Center"
+							Content="Issues" />
+					</StackPanel>
+				</TabItem.Header>
+				<controls:CheckIssuesControl x:Name="IssueListPanel" />
+			</TabItem>
+			<TabItem>
+				<TabItem.Header>
+					<StackPanel Orientation="Horizontal">
+						<ContentControl
+							Width="12"
+							Height="12"
+							VerticalAlignment="Center"
 							Content="{StaticResource Icon_gearwheel}" />
-						<Label Padding="4,0,0,0" VerticalAlignment="Center" Content="Step 1: Find Projects" />
+						<Label Padding="4,0,0,0" VerticalAlignment="Center" Content="Options" />
 					</StackPanel>
 				</TabItem.Header>
 				<controls:OptionsControl x:Name="OptionsPanel" />
-			</TabItem>
-			<TabItem>
-				<TabItem.Header>
-					<StackPanel Orientation="Horizontal">
-						<ContentControl
-							Width="12"
-							Height="12"
-							VerticalAlignment="Center"
-							Content="{StaticResource Icon_elements_tree}" />
-						<Label Padding="4,0,0,0" VerticalAlignment="Center" Content="Step 2: Update References" />
-					</StackPanel>
-				</TabItem.Header>
-				<controls:MainControl x:Name="MainPanel" />
-			</TabItem>
-			<TabItem>
-				<TabItem.Header>
-					<StackPanel Orientation="Horizontal">
-						<ContentControl
-							Width="12"
-							Height="12"
-							VerticalAlignment="Center"
-							Content="{StaticResource Icon_elements_tree}" />
-						<Label Padding="4,0,0,0" VerticalAlignment="Center" Content="Scan Solutions" />
-					</StackPanel>
-				</TabItem.Header>
-				<controls:SolutionsControl x:Name="SolutionsPanel" />
 			</TabItem>
 		</TabControl>
 	</Grid>
