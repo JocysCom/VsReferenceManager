@@ -1,6 +1,8 @@
 ﻿using JocysCom.ClassLibrary.Configuration;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
@@ -57,14 +59,14 @@ namespace JocysCom.VS.ReferenceManager
 		public ItemType ItemType { get => _ItemType; set => SetProperty(ref _ItemType, value); }
 		ItemType _ItemType;
 
-	public bool IsReference =>
-			string.IsNullOrEmpty(ProjectName) && !string.IsNullOrEmpty(ReferenceName);
-
 		[XmlIgnore]
 		public object Tag;
 
 		[XmlIgnore]
-		public List<Info.ProjectInfo> Projects { get; set; } = new List<Info.ProjectInfo>();
+		public FileInfo ProjectFileInfo;
+
+		[XmlIgnore]
+		public List<Info.ProjectInfo> Projects = new List<Info.ProjectInfo>();
 
 		#region ■ ISettingsItem
 		bool ISettingsItem.Enabled { get => IsEnabled; set => IsEnabled = value; }
