@@ -30,7 +30,7 @@ After: Projects reference original Projects, which are also included under "Refe
 
 ## Visual Studio 2022
 
-New Visual Studio 2022 is 64-bit. Video of Visual Studio 2022 opening a solution with 1,600 projects and ~300k files:
+New Visual Studio 2022 is 64-bit application and no longer limited to ~4gb of memory. Video of Visual Studio 2022 opening a solution with 1,600 projects and ~300k files:
 
 <img alt="Solution From" src="ReferenceManager/Documents/Images/VS2022_1600proj_300K_files.gif" width="640" height="360">
 
