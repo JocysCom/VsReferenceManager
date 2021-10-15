@@ -158,7 +158,6 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			ControlsHelper.Invoke(() =>
 			{
 				ScanProgressPanel.UpdateProgress("...", "");
-				ScanProgressPanel.Visibility = Visibility.Visible;
 				ScanButton.IsEnabled = false;
 			});
 			//var games = SettingsManager.UserGames.Items;

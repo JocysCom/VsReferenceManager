@@ -23,7 +23,6 @@
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
-			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		<ToolBarPanel Grid.Row="0" HorizontalAlignment="Left" Style="{StaticResource MainToolBarPanel}">
 			<ToolBar Style="{StaticResource MainToolBar}">
@@ -203,6 +202,5 @@
 				</Style>
 			</DataGrid.CellStyle>
 		</DataGrid>
-		<JcControls:ProgressBarControl x:Name="ScanProgressPanel" Grid.Row="2" x:FieldModifier="public" />
 	</Grid>
 </UserControl>

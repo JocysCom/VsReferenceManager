@@ -17,6 +17,9 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		public UpdateReferencesControl()
 		{
 			InitializeComponent();
+			if (ControlsHelper.IsDesignMode(this))
+				return;
+			ScanProgressPanel.UpdateProgress();
 			SolutionListPanel.RefreshButton.Click += SolutionListPanel_RefreshButton_Click;
 			SolutionListPanel.MainDataGrid.SelectionChanged += SolutionListPanel_MainDataGrid_SelectionChanged;
 			SolutionListPanel.UpdateButton.Click += SolutionListPanel_UpdateButton_Click;
@@ -309,7 +312,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			var success = System.Threading.ThreadPool.QueueUserWorkItem(ProjectUpdateTask, param);
 			if (!success)
 			{
-				_TaskControl.ScanProgressPanel.UpdateProgress("Scan failed!", "", true);
+				ScanProgressPanel.UpdateProgress("Scan failed!", "", true);
 				Global.MainWindow.InfoPanel.RemoveTask(TaskName.Update);
 			}
 		}
@@ -358,7 +361,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			var projects = new List<VSLangProj.VSProject>();
 			ControlsHelper.Invoke(() =>
 			{
-				_TaskControl.ScanProgressPanel.UpdateProgress("Starting...", "", true);
+				ScanProgressPanel.UpdateProgress("Starting...", "", true);
 			});
 			_ProjectUpdater = new ProjectUpdater();
 			_ProjectUpdater.Progress += _ProjectUpdater_Progress;
@@ -379,13 +382,13 @@ namespace JocysCom.VS.ReferenceManager.Controls
 			switch (e.State)
 			{
 				case ProgressStatus.Started:
-					_TaskControl.ScanProgressPanel.UpdateProgress("Started...", "");
+					ScanProgressPanel.UpdateProgress("Started...", "");
 					break;
 				case ProgressStatus.Updated:
-					_TaskControl.ScanProgressPanel.UpdateProgress(e);
+					ScanProgressPanel.UpdateProgress(e);
 					break;
 				case ProgressStatus.Completed:
-					_TaskControl.ScanProgressPanel.UpdateProgress();
+					ScanProgressPanel.UpdateProgress();
 					Global.SaveSettings();
 					UpdateSolution();
 					UpdateProjects();

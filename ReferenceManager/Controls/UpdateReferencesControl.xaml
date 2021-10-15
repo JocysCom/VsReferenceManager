@@ -3,6 +3,7 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:controls="clr-namespace:JocysCom.VS.ReferenceManager.Controls"
+	xmlns:JcControls="clr-namespace:JocysCom.ClassLibrary.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	x:Name="This"
@@ -28,11 +29,13 @@
 			<RowDefinition Height="40*" />
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="60*" />
+			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		<controls:ReferenceListControl x:Name="SolutionListPanel" Grid.Row="0" ProjectsControlType="Solution" />
 		<GridSplitter Grid.Row="1" Style="{StaticResource GridSplitterHorizontal}" />
 		<controls:ReferenceListControl x:Name="ProjectListPanel" Grid.Row="2" ProjectsControlType="Projects" />
 		<GridSplitter Grid.Row="3" Style="{StaticResource GridSplitterHorizontal}" />
 		<controls:ReferenceListControl x:Name="ReferenceListPanel" Grid.Row="4" ProjectsControlType="References" />
+		<JcControls:ProgressBarControl x:Name="ScanProgressPanel" Grid.Row="5" x:FieldModifier="public" />
 	</Grid>
 </UserControl>

@@ -21,7 +21,7 @@ namespace JocysCom.VS.ReferenceManager.Controls
 		public ReferenceListControl()
 		{
 			InitializeComponent();
-			ScanProgressPanel.Visibility = Visibility.Collapsed;
+			//ScanProgressPanel.Visibility = Visibility.Collapsed;
 			if (ControlsHelper.IsDesignMode(this))
 				return;
 			ReferenceList = new SortableBindingList<ReferenceItem>();
