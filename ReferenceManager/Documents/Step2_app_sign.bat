@@ -1,5 +1,5 @@
 @ECHO OFF
-COPY /Y "..\bin\Debug\JocysCom.VS.ReferenceManager.vsix" "JocysCom.VS.ReferenceManager.vsix"
+COPY /Y "..\bin\Release\JocysCom.VS.ReferenceManager.vsix" "JocysCom.VS.ReferenceManager.vsix"
 CALL:SIG "JocysCom.VS.ReferenceManager.vsix"
 echo.
 pause

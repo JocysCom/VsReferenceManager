@@ -79,7 +79,7 @@ namespace JocysCom.VS.ReferenceManager
 							referenceProject = folder.AddFromFile(ri.ProjectPath);
 						});
 					}
-					e.SubMessage = $"Updating Reference: {ri.ReferenceName}";
+					e.SubMessage = $"Updating Reference: {ri.ReferenceName}. Please wait...";
 					Report(e);
 					ControlsHelper.Invoke(() =>
 					{
