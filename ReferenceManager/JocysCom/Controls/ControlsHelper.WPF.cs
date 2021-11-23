@@ -18,7 +18,8 @@ namespace JocysCom.ClassLibrary.Controls
 	{
 		public static void EnableWithDelay(UIElement control)
 		{
-			Task.Run(async delegate {
+			Task.Run(async delegate
+			{
 				await Task.Delay(500).ConfigureAwait(true);
 				control.Dispatcher.Invoke(() => control.IsEnabled = true);
 			});
@@ -201,6 +202,10 @@ namespace JocysCom.ClassLibrary.Controls
 		/// <summary>
 		/// Convert Bitmap to image source.
 		/// </summary>
+		///	<remarks>
+		///	Requires NuGet Package on .NET Core: System.Drawing.Common or...
+		///	set property <UseWindowsForms>true</UseWindowsForms> inside the project.
+		///	</remarks>
 		public static ImageSource GetImageSource(System.Drawing.Bitmap bitmap)
 		{
 			var bi = new System.Windows.Media.Imaging.BitmapImage();
@@ -377,8 +382,9 @@ namespace JocysCom.ClassLibrary.Controls
 		public static void GetActiveControl(FrameworkElement control, out FrameworkElement activeControl, out string activePath)
 		{
 			string _activePath = null;
-			Invoke(() => {
-				_activePath = string.Format("/{0}", control.Name);
+			Invoke(() =>
+			{
+				_activePath = string.Format("/{0}", control?.Name);
 			});
 			activePath = _activePath;
 			// Return current control by default.
@@ -390,8 +396,9 @@ namespace JocysCom.ClassLibrary.Controls
 				control = System.Windows.Input.FocusManager.GetFocusedElement(control) as FrameworkElement;
 				if (control == null)
 					break;
-				Invoke(() => {
-					_activePath = string.Format("/{0}", control.Name);
+				Invoke(() =>
+				{
+					_activePath = string.Format("/{0}", control?.Name);
 				});
 
 				activePath += _activePath;
@@ -768,7 +775,7 @@ namespace JocysCom.ClassLibrary.Controls
 		private static void TextBoxBase_Unloaded(object sender, RoutedEventArgs e)
 			=> EnableAutoScroll((TextBox)sender, false);
 
-		private static  void TextBoxBase_TextChanged(object sender, TextChangedEventArgs e)
+		private static void TextBoxBase_TextChanged(object sender, TextChangedEventArgs e)
 			=> AutoScroll((TextBox)sender);
 
 		private static void TextBoxBase_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

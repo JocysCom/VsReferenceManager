@@ -91,6 +91,7 @@
     <Compile Include="JocysCom\Controls\InfoControl.xaml.cs">
       <DependentUpon>InfoControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="JocysCom\Controls\InitHelper.cs" />
     <Compile Include="JocysCom\Controls\IssuesControl\IssueItem.cs" />
     <Compile Include="JocysCom\Controls\IssuesControl\IssueSeverity.cs" />
     <Compile Include="JocysCom\Controls\IssuesControl\IssueStatus.cs" />

@@ -23,6 +23,18 @@ namespace JocysCom.ClassLibrary.Configuration
 			Initialize();
 		}
 
+		//public void FixLeaks()
+		//{
+
+		//	var items = new SortableBindingList<T>();
+		//	items.AddRange(Items);
+		//	var oldItems = Items;
+		//	Items.FixLeak();
+		//	Items = items;
+		//	oldItems.Clear();
+		//	oldItems = null;
+		//}
+
 		public SettingsData(string fileName, bool userLevel = false, string comment = null, Assembly assembly = null)
 		{
 			Initialize(fileName, userLevel, comment, assembly);
@@ -37,6 +49,8 @@ namespace JocysCom.ClassLibrary.Configuration
 		/// <param name="assembly">Used to get company and product name.</param>
 		void Initialize(string fileName = null, bool userLevel = false, string comment = null, Assembly assembly = null)
 		{
+			// Wraps all methods into lock.
+			//var items = System.Collections.ArrayList.Synchronized(Items);
 			Items = new SortableBindingList<T>();
 			_Comment = comment;
 			var company = Application.CompanyName;
@@ -85,7 +99,7 @@ namespace JocysCom.ClassLibrary.Configuration
 			}
 		}
 
-		public T[] ItemsToArraySyncronized()
+		public T[] ItemsToArraySynchronized()
 		{
 			lock (SyncRoot)
 				return Items.ToArray();
@@ -118,7 +132,7 @@ namespace JocysCom.ClassLibrary.Configuration
 			var ev = Saving;
 			if (ev != null)
 				ev(this, new EventArgs());
-			var items = ItemsToArraySyncronized();
+			var items = ItemsToArraySynchronized();
 			lock (saveReadFileLock)
 			{
 				var type = items.FirstOrDefault()?.GetType();

@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Linq;
 
 namespace JocysCom.ClassLibrary.Controls
 {
@@ -14,7 +13,7 @@ namespace JocysCom.ClassLibrary.Controls
 	{
 		public MessageBoxWindow()
 		{
-			InitializeComponent();
+			InitHelper.InitTimer(this, InitializeComponent);
 			LinkTextBlock.Visibility = Visibility.Collapsed;
 			// Center owner.
 			var owner = Application.Current?.MainWindow;
