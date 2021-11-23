@@ -56,7 +56,7 @@ namespace JocysCom.VS.ReferenceManager
 					e.SubIndex = r;
 					e.SubCount = references.Count;
 					e.SubData = ri;
-					e.SubMessage = $"Adding Reference Project to Solution: {ri.ProjectName}";
+					e.SubMessage = $"Adding Reference Project to Solution: {ri.ProjectName}. Please wait...";
 					Report(e);
 					// If project name not available then skip.
 					if (string.IsNullOrEmpty(ri.ProjectPath))
