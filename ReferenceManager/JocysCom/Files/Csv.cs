@@ -114,15 +114,18 @@ namespace JocysCom.ClassLibrary.Files
 
 #endif
 
-		public static DataTable Read(string path, bool haveHead = false)
+		public static DataTable Read(string path, bool haveHead = false, bool readData = true)
 		{
 			var table = new DataTable();
 			Read(path, (position, line, values) =>
 			{
+				// If CSV have column header then...
 				if (haveHead && line == 0)
 				{
 					for (int i = 0; i < values.Length; i++)
 						table.Columns.Add(values[i]);
+					if (!readData)
+						return false;
 				}
 				else
 				{
@@ -170,7 +173,8 @@ namespace JocysCom.ClassLibrary.Files
 			{
 				string line = null;
 				var i = 0;
-				while ((line = sr.ReadLine()) != null)
+				var allowToContinue = true;
+				while (allowToContinue && (line = sr.ReadLine()) != null)
 				{
 					var matches = splitRx.Matches(line).Cast<Match>().ToArray();
 					// In this case Length will be always 1.
@@ -190,7 +194,7 @@ namespace JocysCom.ClassLibrary.Files
 						}
 						//foreach (var openValue in Record.Groups["OpenValue"].Captures)
 						//	Console.WriteLine("ERROR - Open ended quoted value: " + openValue.Value);
-						var allowToContinue = callBack.Invoke(sr.BaseStream.Position, i, values);
+						allowToContinue = callBack.Invoke(sr.BaseStream.Position, i, values);
 						if (!allowToContinue)
 							break;
 					}

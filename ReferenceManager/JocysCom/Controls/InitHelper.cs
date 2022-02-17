@@ -58,6 +58,7 @@ namespace JocysCom.ClassLibrary.Controls
 			ih.Control.Loaded += Control_Loaded;
 			ih.Control.Unloaded += Control_Unloaded;
 			ih.Control.IsVisibleChanged += Control_IsVisibleChanged;
+			//ih.Control.PropertyChanged += Control_PropertyChanged;
 			ih._Timer.Start();
 		}
 
@@ -70,6 +71,7 @@ namespace JocysCom.ClassLibrary.Controls
 			control.Loaded -= Control_Loaded;
 			control.Unloaded -= Control_Unloaded;
 			control.IsVisibleChanged -= Control_IsVisibleChanged;
+			//control.PropertyChanged -= Control_PropertyChanged;
 		}
 
 		private static void Control_Loaded(object sender, RoutedEventArgs e)
@@ -80,6 +82,20 @@ namespace JocysCom.ClassLibrary.Controls
 		}
 
 		private static void Control_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+		{
+			RestartTimer(sender);
+		}
+
+		/// <summary>
+		/// Xamarin.
+		/// </summary>
+		private static void Control_PropertyChanged(object sender, EventArgs e)
+		{
+			RestartTimer(sender);
+		}
+
+
+		private static void RestartTimer(object sender)
 		{
 			InitHelper ih = null;
 			lock (TimersLock)
@@ -100,18 +116,18 @@ namespace JocysCom.ClassLibrary.Controls
 			InitHelper ih = null;
 			// Find InitHelper by timer.
 			lock (TimersLock)
-				ih = Timers.FirstOrDefault(x => Equals(x._Timer, sender));
-			if (ih == null)
-				return;
-			_InitEndCount++;
-			ih.WriteLine("INIT END  ");
-			// Disconnect all links.
-			ih.Control.IsVisibleChanged -= Control_IsVisibleChanged;
-			ih._Timer.Dispose();
-			lock (TimersLock)
 			{
-				ih.Control = null;
+				ih = Timers.FirstOrDefault(x => Equals(x._Timer, sender));
+				if (ih == null)
+					return;
 				Timers.Remove(ih);
+				_InitEndCount++;
+				ih.WriteLine("INIT END");
+				// Disconnect all links.
+				ih.Control.IsVisibleChanged -= Control_IsVisibleChanged;
+				//ih.Control.PropertyChanged -= Control_PropertyChanged;
+				ih.Control = null;
+				ih._Timer.Dispose();
 			}
 		}
 

@@ -86,8 +86,8 @@ namespace JocysCom.ClassLibrary.IO
 							e.SubCount = 0;
 							e.SubData = fileList;
 							e.State = ProgressStatus.Updated;
-							e.TopMessage = $"Scan Folder: {_Directories[e.TopIndex].FullName}";
-							var file = fileList[e.SubIndex];
+							e.TopMessage = $"Scan Folder: {_Directories[(int)e.TopIndex].FullName}";
+							var file = fileList[(int)e.SubIndex];
 							var name = file.FullName;
 							var size = BytesToString(file.Length);
 							e.SubMessage = $"File: {name} ({size})";

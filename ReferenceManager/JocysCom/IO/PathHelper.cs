@@ -218,7 +218,7 @@ namespace JocysCom.ClassLibrary.IO
 						var items = new List<KeyValuePair<string, string>>();
 						foreach (var key in keys)
 						{
-							var item = new KeyValuePair<string, string>(string.Format("$({0})", key), System.Environment.GetFolderPath(key));
+							var item = new KeyValuePair<string, string>($"{key}", System.Environment.GetFolderPath(key));
 							// Make sure all values are not empty and unique.
 							if (!string.IsNullOrEmpty(item.Key) && !string.IsNullOrEmpty(item.Value))
 								items.Add(item);
@@ -229,8 +229,8 @@ namespace JocysCom.ClassLibrary.IO
 						foreach (var listItem in list)
 						{
 							// If list doesn't contains key then...
-							if (!SpecialFolders.ContainsKey(listItem.Key))
-								SpecialFolders.Add(listItem.Key, listItem.Value);
+							if (!_SpecialFolders.ContainsKey(listItem.Key))
+								_SpecialFolders.Add(listItem.Key, listItem.Value);
 						}
 					}
 				}

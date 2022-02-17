@@ -205,8 +205,12 @@ namespace JocysCom.VS.ReferenceManager
 			var solutionProjects = solution.ProjectsInOrder;
 			for (int p = 0; p < solutionProjects.Count; p++)
 			{
-				var solutionProject = solutionProjects[p];
-				var fullName = Path.Combine(ri.SolutionPath, solutionProject.RelativePath);
+				var sp = solutionProjects[p];
+				// If path starts with "http[s]://" then skip.
+				if (sp.RelativePath.StartsWith("http://") || sp.RelativePath.StartsWith("https://"))
+					continue;
+				// Get full path.
+				var fullName = Path.Combine(ri.SolutionPath, sp.RelativePath);
 				// Fix dot notations.
 				fullName = Path.GetFullPath(fullName);
 				if (ri.Projects.Any(x => x.File.FullName == fullName))
@@ -222,11 +226,11 @@ namespace JocysCom.VS.ReferenceManager
 				// Skip if project exists.
 				if (!pi.File.Exists)
 					continue;
-				pi.ProjectName = solutionProject.ProjectName;
-				pi.RelativePath = solutionProject.RelativePath;
-				pi.ProjectGuid = solutionProject.ProjectGuid;
-				pi.ProjectType = solutionProject.ProjectType;
-				pi.OutputType = InfoHelper.GetOutputType(pi.File.FullName, solutionProject.ProjectName);
+				pi.ProjectName = sp.ProjectName;
+				pi.RelativePath = sp.RelativePath;
+				pi.ProjectGuid = sp.ProjectGuid;
+				pi.ProjectType = sp.ProjectType;
+				pi.OutputType = InfoHelper.GetOutputType(pi.File.FullName, sp.ProjectName);
 				pi.AssemblyName = InfoHelper.GetElementInnerText(pi.File.FullName, "AssemblyName");
 				ri.Projects.Add(pi);
 			}
